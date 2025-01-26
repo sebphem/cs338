@@ -8,6 +8,8 @@ Windows:
 python -m venv venv
 venv/Scripts/activate
 python -m pip install -r requirements.txt
+mkdir logging
+"" > ./logging/api.log
 ```
 
 For powershell, you can check the install of the venv with
@@ -22,6 +24,8 @@ Mac/Linux:
 python -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
+mkdir logging
+touch logging/api.log
 ```
 
 ## Running the backend

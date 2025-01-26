@@ -19,7 +19,7 @@ import unittest
 # returns None if an error occurs
 # dict will always have a "status" where -1 is not found and 1 is found
 # dict will always have a "body" where the data is either returned or there is just a message saying name is not found
-def check_sex_offender(lastname : str, firstname :str) -> dict[str,str|int]:
+def check_sex_offender(lastname : str, firstname :str, **kwargs) -> dict[str,str|int]:
     try:
         # queue up all Sex offender CSV files in dir
         sex_offender_list = glob.glob(os.path.join(os.getcwd(),f"{"SO_"}*.csv"))

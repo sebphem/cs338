@@ -1,30 +1,60 @@
 import argparse
+import sys
+from pathlib import Path
+import os
+from datetime import datetime
 from flask import Flask, request, jsonify
 
 #import the functions from their respective folders
 from common.criminals.parser import check_sex_offender
+from logs.create_log import build_logger
 
-
-
+log = build_logger(Path(os.path.abspath('.')) / 'logs' / 'api.log')
 app = Flask(__name__)
+
 
 @app.route('/api/so/', methods=['GET'])
 def sexOffenders():
-    
-    return jsonify({'message': 'Hello, world!'})
-
-@app.route('/api/greet/<name>', methods=['GET'])
-def greet(name):
-    return jsonify({'message': f'Hello, {name}!'})
+    log.debug("so endpoint called with args: ", vars(request.args))
+    try:
+        firstname = request.args.get("first",type=str)
+        last = request.args.get("last",type=str)
+        dob = request.args.get("dob",type=str)
+        date_object = datetime.strptime(dob, "%Y-%m-%d") if dob else None
+        res = check_sex_offender(**request.args)
+        if res["status"] == 1:
+            return jsonify({'num_matches': len(res["body"]), # type: ignore
+                            'matches': res["body"]}), 200
+        else:
+            return jsonify({'num_matches': 0, # type: ignore
+                            'matches': {}}), 400
+    except Exception as err:
+        log.error("Unexpected error occurred: ", err)
+        return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
 
 @app.route('/api/data', methods=['POST'])
-def data():
+def blacklist():
     json_data = request.get_json()
     if not json_data:
         return jsonify({'error': 'Invalid input'}), 400
 
     return jsonify({'received': json_data}), 200
 
+@app.route('/', methods=['GET'])
+def list_endpoints():
+    """
+    List all registered routes in the application.
+    """
+    routes = []
+    for rule in app.url_map.iter_rules():
+        # Skip the endpoint if it's not associated with a function
+        if rule.endpoint != 'static':
+            routes.append({
+                'endpoint': rule.endpoint,
+                'methods': list(rule.methods), #type: ignore
+                'url': str(rule)
+            })
+    return jsonify({'routes': routes})
 
 
 def build_argparser() -> argparse.ArgumentParser:
