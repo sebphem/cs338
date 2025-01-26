@@ -13,15 +13,17 @@ log = build_logger(Path(os.path.abspath('.')) / 'logs' / 'api.log')
 app = Flask(__name__)
 
 
+#pretty good example of how to write an api endpoint
 @app.route('/api/so/', methods=['GET'])
 def sexOffenders():
-    log.debug("so endpoint called with args: ", vars(request.args))
+    #log.debug is exactly like printf in c
+    log.debug(f"so endpoint called with args: {vars(request.args)}")
     try:
         firstname = request.args.get("first",type=str)
         last = request.args.get("last",type=str)
         dob = request.args.get("dob",type=str)
         date_object = datetime.strptime(dob, "%Y-%m-%d") if dob else None
-        res = check_sex_offender(**request.args)
+        res = check_sex_offender(**{**request.args, "dob_object":date_object})
         if res["status"] == 1:
             return jsonify({'num_matches': len(res["body"]), # type: ignore
                             'matches': res["body"]}), 200
@@ -58,7 +60,9 @@ def list_endpoints():
 
 
 def build_argparser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Backend for the server deployed locally")
+    parser = argparse.ArgumentParser(
+        description="Backend for the server deployed locally"
+        prog="api")
     flask_opts = parser.add_argument_group("flask options")
     flask_opts.add_argument("-p", "--port",type=int,default=8000)
     return parser
