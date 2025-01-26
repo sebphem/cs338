@@ -2,19 +2,18 @@ import pandas as pd
 import glob
 import os
 import json
-
+import unittest
 
 # Function that aggregates all CSV files in current dir and checks the given name against the aggregation
 # Returns a dict if name is found / not found
 # returns None if an error occurs
 # dict will always have a "status" where -1 is not found and 1 is found
 # dict will always have a "body" where the data is either returned or there is just a message saying name is not found
-def check_sex_offender(lastname, firstname):
+def check_sex_offender(lastname : str, firstname :str) -> dict[str,str|int]:
     try:
         # queue up all Sex offender CSV files in dir
         sex_offender_list = glob.glob(os.path.join(os.getcwd(),f"{"SO_"}*.csv"))
         #print("found files:", sex_offender_list)
-        
         # aggregate dataframes
         dataframes = []
         for each in sex_offender_list:
@@ -32,17 +31,35 @@ def check_sex_offender(lastname, firstname):
             row_data = json.dumps(result.iloc[0].to_dict())
             return {"status": 1, "body": row_data}
 
-    
     except Exception as err:
-        print("Exception has occurred: ", err)
-        return None
+        print("\tException has occurred in sex offender database:\n", err)
+        raise Exception(err)
 
-"""
-# basic test cases
-test1 = check_sex_offender("williams", "glynn")
-assert (test1["status"] == 1)
-print("test1 results:", test1)
-test2 = check_sex_offender("Jim", "Bobbinson")
-assert (test2["status"] == -1)
-print("test2 results:", test2)
-"""
+class Sex_offender_unittests(unittest.TestCase):
+    def testExists(self):
+        sex_offenders = {"glynn":"williams"}
+        for first, last in sex_offenders.items():
+            res = check_sex_offender(last, first)
+            self.assertEqual(res["status"],1)
+
+    def testNotExists(self):
+        not_so = {"Jim": "Bobbinson"}
+        for first, last in not_so.items():
+            res = check_sex_offender(last, first)
+            self.assertEqual(res["status"],-1)
+
+    def testCapsIters(self):
+        sex_offenders = {"TIMOTHY":"DUKES", "timothy":"dukes", "tImoThY":"dUkEs"}
+        for first, last in sex_offenders.items():
+            res = check_sex_offender(last, first)
+            self.assertEqual(res["status"],1)
+
+    def testNoFirstName(self):
+        sex_offenders = {"TIMOTHY":""}
+        for first, last in sex_offenders.items():
+            res = check_sex_offender(last, first)
+            self.assertEqual(res["status"],1)
+
+
+if __name__ == '__main__':
+    unittest.main()
