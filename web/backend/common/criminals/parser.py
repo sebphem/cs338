@@ -36,10 +36,10 @@ def check_sex_offender(lastname : str, firstname :str, **kwargs) -> dict[str,str
 
         # return results
         if result.empty:
-            return {"status": -1, "body": "Name not found in DB"}
+            return None
         else:
-            row_data = json.dumps(result.iloc[0].to_dict())
-            return {"status": 1, "body": row_data}
+            row_data = result.to_dict(orient = "records")
+            return row_data
 
     except Exception as err:
         print("\tException has occurred in sex offender database:\n", err)
