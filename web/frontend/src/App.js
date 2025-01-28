@@ -1,19 +1,21 @@
 // import logo from './logo.svg';
 // import './App.css';
 import React from 'react';
-import SearchForm from './SearchForm';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import NavBar from './navBar';
+import HomePage from './HomePage';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './mystery.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-      <div class="container-fluid ">
-        "hello"
-      </div>
-        <SearchForm />
-      </header>
-    </div>
+    <Router>
+      <NavBar />
+      <Switch>
+        <Route exact path="/" component={HomePage} />
+        {}
+      </Switch>
+    </Router>
   );
 }
 
