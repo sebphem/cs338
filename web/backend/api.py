@@ -16,7 +16,6 @@ log = build_logger(Path(os.path.abspath('.')) / 'logs' / 'api.log')
 app = Flask(__name__)
 
 
-#pretty good example of how to write an api endpoint
 @app.route('/api/generate-profile/', methods=['GET'])
 def generateProfileEndpoint():
     #log.debug is exactly like printf in c
@@ -35,16 +34,17 @@ def generateProfileEndpoint():
         # TODO: actually implement this
         # res = generateProfile(**{, "dob_object":date_object})
 
-        res = ""
+        res = "asdfasdf"
         image_1 = image_to_base64(Path(os.path.abspath('.')) / 'test' / 'images' / 'test_1.webp')
         image_2 = image_to_base64(Path(os.path.abspath('.')) / 'test' / 'images' / 'test_2.jpg')
         if res:
-            return jsonify({'sections':
+            return jsonify({'sections':[
                             {'text': "Gojo Satoru’s online presence is exactly what you’d expect from the world’s strongest sorcerer—unapologetically flashy, effortlessly charismatic, and borderline infuriating. His Twitter (or X) is a chaotic mix of smug one-liners, cryptic hints about jujutsu society, and relentless trolling of his students and fellow sorcerers. His Instagram is filled with aesthetic shots of him traveling to exotic locations, effortlessly stylish blindfold selfies, and the occasional cursed technique flex, just to remind everyone who’s on top. On TikTok, he seamlessly blends humor and power, casually demonstrating Infinity while participating in absurd trends, making even the most ridiculous videos go viral. Gojo thrives in the spotlight, using his platforms as both entertainment and a way to subtly challenge the rigid structures of the jujutsu world. Whether he’s engaging with fans or simply showing off, his presence online is as magnetic as it is unpredictable—because, of course, Gojo Satoru never does anything halfway.", # type: ignore
                             'image': image_1},
-                            {'text': "Gojo Satoru’s physical appearance in photos is nothing short of striking, effortlessly capturing attention no matter the setting. With his signature blindfold or dark-tinted sunglasses, he exudes an air of mystery that only adds to his undeniable charisma. When he does reveal his eyes—those mesmerizing Six Eyes shimmering in shades of crystalline blue—the internet practically breaks. His stark white hair, always slightly tousled yet impossibly stylish, frames his sharp features, giving him an almost ethereal look. Whether he's smirking in a perfectly lit, high-contrast black-and-white shot or caught mid-laugh in a candid, his presence is magnetic. Even in casual photos, he somehow looks like he just stepped out of a high-fashion editorial—whether he’s lounging in oversized streetwear, donning his sleek sorcerer’s uniform, or effortlessly pulling off a tailored suit. The angles, the lighting, the confidence—it all makes every image of Gojo feel like it was meant to go viral.", # type: ignore
-                            'image': image_2},
-                            }), 200
+                            {'text':
+                             "Gojo Satoru’s physical appearance in photos is nothing short of striking, effortlessly capturing attention no matter the setting. With his signature blindfold or dark-tinted sunglasses, he exudes an air of mystery that only adds to his undeniable charisma. When he does reveal his eyes—those mesmerizing Six Eyes shimmering in shades of crystalline blue—the internet practically breaks. His stark white hair, always slightly tousled yet impossibly stylish, frames his sharp features, giving him an almost ethereal look. Whether he's smirking in a perfectly lit, high-contrast black-and-white shot or caught mid-laugh in a candid, his presence is magnetic. Even in casual photos, he somehow looks like he just stepped out of a high-fashion editorial—whether he’s lounging in oversized streetwear, donning his sleek sorcerer’s uniform, or effortlessly pulling off a tailored suit. The angles, the lighting, the confidence—it all makes every image of Gojo feel like it was meant to go viral.", # type: ignore
+                            'image': image_2}
+                            ]}), 200
         else:
             return jsonify({'num_matches': 0, # type: ignore
                             'matches': {}}), 400
