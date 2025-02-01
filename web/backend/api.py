@@ -4,9 +4,10 @@ from pathlib import Path
 import os
 from datetime import datetime
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 #import the functions from their respective folders
-from common.criminals.parser import check_sex_offender
+#from common.criminals.parser import check_sex_offender
 # from common.social_medias.linkedin import
 from common.img_to_base64 import image_to_base64
 
@@ -14,6 +15,7 @@ from logs.create_log import build_logger
 
 log = build_logger(Path(os.path.abspath('.')) / 'logs' / 'api.log')
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/api/generate-profile/', methods=['GET'])
@@ -62,13 +64,13 @@ def sexOffenders():
         last = request.args.get("last",type=str)
         dob = request.args.get("dob",type=str)
         date_object = datetime.strptime(dob, "%Y-%m-%d") if dob else None
-        res = check_sex_offender(**{**request.args, "dob_object":date_object})
-        if res["status"] == 1:
-            return jsonify({'num_matches': len(res["body"]), # type: ignore
+        #res = check_sex_offender(**{**request.args, "dob_object":date_object})
+        #if res["status"] == 1:
+        return jsonify({'num_matches': len(res["body"]), # type: ignore
                             'matches': res["body"]}), 200
-        else:
-            return jsonify({'num_matches': 0, # type: ignore
-                            'matches': {}}), 400
+        #else:
+        #    return jsonify({'num_matches': 0, # type: ignore
+        #                    'matches': {}}), 400
     except Exception as err:
         log.error("Unexpected error occurred: ", err)
         return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500

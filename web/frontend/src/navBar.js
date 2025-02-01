@@ -10,7 +10,7 @@ export default function NavBar() {
                     <img
                         src={logo}
                         alt="UnIncognito Logo"
-                        width="40" // Adjust the width and height as needed
+                        width="40"
                         height="40"
                         className="d-inline-block align-top"    
                     />        

@@ -11,7 +11,7 @@ def build_logger(path: str|Path) -> logging.Logger:
                                            datefmt='%Y-%m-%dT%H:%M:%S')
     deep_log.setFormatter(deep_log_formatter)
     log.addHandler(deep_log)
-    log.info(f"{"="*15}\tRUNNING BACKEND API\t{"="*15}\n")
+    #log.info(f"{"="*15}\tRUNNING BACKEND API\t{"="*15}\n")
 
     console_log = logging.StreamHandler(sys.stderr)
     console_log.setLevel(logging.INFO)
