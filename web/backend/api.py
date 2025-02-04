@@ -60,19 +60,24 @@ def sexOffenders():
     #log.debug is exactly like printf in c
     log.debug(f"so endpoint called with args: {vars(request.args)}")
     try:
-        firstname = request.args.get("first",type=str)
-        last = request.args.get("last",type=str)
-        dob = request.args.get("dob",type=str)
-        date_object = datetime.strptime(dob, "%Y-%m-%d") if dob else None
+        firstname = request.args.get("firstname",type=str)
+        last = request.args.get("lastname",type=str)
+        #dob = request.args.get("dob",type=str)
+        #date_object = datetime.strptime(dob, "%Y-%m-%d") if dob else None
+        from common.criminals.parser import check_sex_offender
         #res = check_sex_offender(**{**request.args, "dob_object":date_object})
+        res = check_sex_offender(**{**request.args}) # dont need DOB for demo, screwing w/ me running tests on this
         #if res["status"] == 1:
-        return jsonify({'num_matches': len(res["body"]), # type: ignore
-                            'matches': res["body"]}), 200
+        if res["status"] == -1:
+            return jsonify({"num_matches": 0, "matches": None}), 200
+        else:
+            return jsonify({'num_matches': len(res["body"]), # type: ignore
+                                'matches': res["body"]}), 200
         #else:
         #    return jsonify({'num_matches': 0, # type: ignore
         #                    'matches': {}}), 400
     except Exception as err:
-        log.error("Unexpected error occurred: ", err)
+        log.error("Unexpected error occurred: ", err, "args:", request.args)
         return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
 
 @app.route('/api/data', methods=['POST'])

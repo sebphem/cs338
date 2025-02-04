@@ -19,10 +19,19 @@ import unittest
 # returns None if an error occurs
 # dict will always have a "status" where -1 is not found and 1 is found
 # dict will always have a "body" where the data is either returned or there is just a message saying name is not found
-def check_sex_offender(lastname : str, firstname :str, **kwargs) -> dict[str,str|int]:
+def check_sex_offender(**kwargs) -> dict[str,str|int]:
+    #print ("called with:", kwargs)
     try:
+        if "lastname" in kwargs:
+            lastname = kwargs["lastname"]
+        else:
+            lastname = ""
+        if "firstname" in kwargs:
+            firstname = kwargs["firstname"]
+        else:
+            firstname = ""
         # queue up all Sex offender CSV files in dir
-        sex_offender_list = glob.glob(os.path.join(os.getcwd(),f"{"SO_"}*.csv"))
+        sex_offender_list = glob.glob(os.path.join("./common/criminals","SO_*.csv"))
         #print("found files:", sex_offender_list)
         # aggregate dataframes
         dataframes = []
@@ -32,14 +41,21 @@ def check_sex_offender(lastname : str, firstname :str, **kwargs) -> dict[str,str
         sex_offender_df = pd.concat(dataframes, ignore_index=True)
 
         # check to see if name is in data
-        result = sex_offender_df[(sex_offender_df["LAST"] == lastname.upper()) & (sex_offender_df["FIRST"] == firstname.upper())]
+        if lastname == "" and firstname != "": # check against firstname only
+            result = sex_offender_df[(sex_offender_df["FIRST"] == firstname.upper())]
+        elif lastname != "" and firstname == "": # check against lastname only
+            result = sex_offender_df[(sex_offender_df["LAST"] == lastname.upper())]
+        elif lastname != "" and firstname != "": # check both
+            result = sex_offender_df[(sex_offender_df["LAST"] == lastname.upper()) & (sex_offender_df["FIRST"] == firstname.upper())]
+        else:
+            return {"status": -1, "body": "No name provided, expects at least first or last name"}
 
         # return results
         if result.empty:
-            return None
+            return {"status":-1, "body":None}
         else:
             row_data = result.to_dict(orient = "records")
-            return row_data
+            return {"status":1, "body":row_data}
 
     except Exception as err:
         print("\tException has occurred in sex offender database:\n", err)
