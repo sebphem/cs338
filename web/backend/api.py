@@ -46,7 +46,10 @@ def generateProfileEndpoint():
                             {'text':
                              "Gojo Satoru’s physical appearance in photos is nothing short of striking, effortlessly capturing attention no matter the setting. With his signature blindfold or dark-tinted sunglasses, he exudes an air of mystery that only adds to his undeniable charisma. When he does reveal his eyes—those mesmerizing Six Eyes shimmering in shades of crystalline blue—the internet practically breaks. His stark white hair, always slightly tousled yet impossibly stylish, frames his sharp features, giving him an almost ethereal look. Whether he's smirking in a perfectly lit, high-contrast black-and-white shot or caught mid-laugh in a candid, his presence is magnetic. Even in casual photos, he somehow looks like he just stepped out of a high-fashion editorial—whether he’s lounging in oversized streetwear, donning his sleek sorcerer’s uniform, or effortlessly pulling off a tailored suit. The angles, the lighting, the confidence—it all makes every image of Gojo feel like it was meant to go viral.", # type: ignore
                             'image': image_2}
-                            ]}), 200
+                            ],
+                            "linkedin":"https://www.linkedin.com/in/sebphem/",
+                            "youtube":"https://www.youtube.com/@kondata973",
+                            "instagram":"https://www.instagram.com/seb.phem/"}), 200
         else:
             return jsonify({'num_matches': 0, # type: ignore
                             'matches': {}}), 400
