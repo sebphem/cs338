@@ -6,6 +6,7 @@ import NavBar from './navBar';
 import HomePage from './HomePage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './mystery.css';
+import ResultsPage from './ResultsPage';
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
       <NavBar />
       <Switch>
         <Route exact path="/" component={HomePage} />
-        {}
+        <Route exact path="/results" component={ResultsPage} />
       </Switch>
     </Router>
   );

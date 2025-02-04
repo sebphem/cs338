@@ -1,5 +1,5 @@
-export function fetchDataFromServer() {
-    const apiUrl = 'http://127.0.0.1:8000/api/generate-profile/';
+export function fetchDataFromServer(lastName, firstName) {
+    const apiUrl = `http://127.0.0.1:8000/api/so/?lastname=${encodeURIComponent(lastName)}&firstname=${encodeURIComponent(firstName)}`;
     return fetch(apiUrl)
         .then(response => {
             if (!response.ok) {

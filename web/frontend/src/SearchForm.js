@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, InputGroup } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 
 function SearchForm() {
+    const history = useHistory();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -14,8 +16,10 @@ function SearchForm() {
             alert('Please enter both first and last names.');
             return;
         }
-        alert(`Searching for: ${firstName} ${lastName}`);
-        // Add the API call or processing logic here
+        const queryParams = `?firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}`;
+
+        // alert(`Searching for: ${firstName} ${lastName}`);
+        history.push('/results' + queryParams);
     };
 
     return (
