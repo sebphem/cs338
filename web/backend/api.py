@@ -36,10 +36,16 @@ def generateProfileEndpoint():
         # TODO: actually implement this
         # res = generateProfile(**{, "dob_object":date_object})
 
+
+
         res = "asdfasdf"
+        analysis = "AI analysis goes here"
         image_1 = image_to_base64(Path(os.path.abspath('.')) / 'test' / 'images' / 'test_1.webp')
         image_2 = image_to_base64(Path(os.path.abspath('.')) / 'test' / 'images' / 'test_2.jpg')
         if res:
+            # Code for AI analysis, uncomment when profile is generated and add it to the return
+            # from common.Analyzer.parser import analyze_profile
+            # analysis = analyze_profile(res)
             return jsonify({'sections':[
                             {'text': "Gojo Satoru’s online presence is exactly what you’d expect from the world’s strongest sorcerer—unapologetically flashy, effortlessly charismatic, and borderline infuriating. His Twitter (or X) is a chaotic mix of smug one-liners, cryptic hints about jujutsu society, and relentless trolling of his students and fellow sorcerers. His Instagram is filled with aesthetic shots of him traveling to exotic locations, effortlessly stylish blindfold selfies, and the occasional cursed technique flex, just to remind everyone who’s on top. On TikTok, he seamlessly blends humor and power, casually demonstrating Infinity while participating in absurd trends, making even the most ridiculous videos go viral. Gojo thrives in the spotlight, using his platforms as both entertainment and a way to subtly challenge the rigid structures of the jujutsu world. Whether he’s engaging with fans or simply showing off, his presence online is as magnetic as it is unpredictable—because, of course, Gojo Satoru never does anything halfway.", # type: ignore
                             'image': image_1},
@@ -49,13 +55,16 @@ def generateProfileEndpoint():
                             ],
                             "linkedin":"https://www.linkedin.com/in/sebphem/",
                             "youtube":"https://www.youtube.com/@kondata973",
-                            "instagram":"https://www.instagram.com/seb.phem/"}), 200
+                            "instagram":"https://www.instagram.com/seb.phem/",
+                            "analysis": analysis}), 200
         else:
             return jsonify({'num_matches': 0, # type: ignore
                             'matches': {}}), 400
     except Exception as err:
         log.error("Unexpected error occurred: ", err)
         return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
+
+
 
 #pretty good example of how to write an api endpoint
 @app.route('/api/so/', methods=['GET'])
@@ -88,8 +97,19 @@ def blacklist():
     json_data = request.get_json()
     if not json_data:
         return jsonify({'error': 'Invalid input'}), 400
+    else:
+        if "firstname" and "lastname" not in json_data:
+            return jsonify({"error": "expected firstname and lastname"}), 400
+        try:
+            firstname = json_data["firstname"]
+            lastname = json_data["lastname"]
+            from common.No_Check_List.parser import add_name
+            add_name(lastname, firstname)
+            return jsonify({"status": "received, added to list"})
+        except Exception as err:
+            log.error("Unexpected error occurred: ", err)
+            return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
 
-    return jsonify({'received': json_data}), 200
 
 @app.route('/', methods=['GET'])
 def list_endpoints():
