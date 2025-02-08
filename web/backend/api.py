@@ -65,6 +65,29 @@ def generateProfileEndpoint():
         return jsonify({'error': 'An unexpected error occurred. Please try again later.'}), 500
 
 
+# new endpoint (front-end sends me an array of images as base64 strings)
+@app.route("/analyze-images", methods=["POST"])
+def analyze_images():
+    try:
+        data = request.json
+        log.debug(f"Analyze images called with: {data}")
+        images = data.get("images", [])
+
+        if not images:
+            return jsonify({"error": "No images provided"}), 400
+
+
+        from common.Analyzer.parser import analyze_images
+        responses = analyze_images(images)
+
+        if responses == None:
+            return jsonify({"responses": "images must be in JPG or PNG format"}), 400
+
+        return jsonify({"responses": responses}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 #pretty good example of how to write an api endpoint
 @app.route('/api/so/', methods=['GET'])
