@@ -38,8 +38,14 @@ interface Preferences {
     education?: string;
 }
 
+interface PromptedImages{
+    prompt?:string;
+    image:string;
+}
+
 interface UserData{
     profile: Profile;
     preferences: Preferences;
     prompts: string[];
+    promptedimages:PromptedImages[];
 }
