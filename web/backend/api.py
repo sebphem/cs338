@@ -88,6 +88,29 @@ def analyze_images():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# endpoint to return top 3 prompts for step one
+@app.route("/step-one-prompts", methods=["POST"])
+def step_one():
+    try:
+        data = request.json
+        log.debug(f"Step one called with: {data}")
+        profile_data = data.get("profile", {})
+        preferences_data = data.get("preferences", {})
+        from ..interfaces.send_user_info.send.interface import Profile, Preferences, UserData
+
+        if profile_data and preferences_data: # unpack data into profile and preferences
+            user_profile = Profile(**profile_data)
+            user_preferences = Preferences(**preferences_data)
+            user_data = UserData(user_profile, user_preferences)
+
+            from common.Analyzer.parser import step_one
+            top_prompts = step_one(user_data)
+            return jsonify({"prompts": top_prompts, "UserData": user_data}), 200
+        else:
+            return jsonify({"error: something went wrong with unpacking profile and preferences"}), 400
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 #pretty good example of how to write an api endpoint
 @app.route('/api/so/', methods=['GET'])
