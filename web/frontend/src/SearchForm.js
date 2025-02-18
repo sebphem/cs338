@@ -1,92 +1,104 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, InputGroup } from 'react-bootstrap';
+import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 
 function SearchForm() {
     const history = useHistory();
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [email, setEmail] = useState('');
-    const [socialMedia, setSocialMedia] = useState('');
+    const [profile, setProfile] = useState({
+        name: '',
+        age: 0,
+        height: 0,
+        location: '',
+        dating_intentions: [],
+        relationship_type: [],
+        ethnicity: [],
+        children: '',
+        family_plans: '',
+        covid_vaccine: false,
+        pets: '',
+        zodiac: '',
+        work: '',
+        job_title: '',
+        school: '',
+        education: '',
+        religious_beliefs: '',
+        hometown: '',
+        politics: '',
+        languages: [],
+        drinking: '',
+        smoking: false,
+        weed: false,
+        drugs: false,
+    });
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        if (!firstName || !lastName) {
-            alert('Please enter both first and last names.');
-            return;
-        }
-        const queryParams = `?firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}`;
+    const [preferences, setPreferences] = useState({
+        max_distance: 50,
+        age_range: [18, 100],
+        relationship_type: [],
+        height_range: [0, 300],
+        dating_intentions: [],
+        children: '',
+        family_plans: '',
+        vices: [],
+        politics: '',
+        education: ''
+    });
 
-        // alert(`Searching for: ${firstName} ${lastName}`);
-        history.push('/results' + queryParams);
+    // Handlers for profile and preferences inputs
+    const handleProfileChange = (e) => {
+        setProfile({ ...profile, [e.target.name]: e.target.value });
     };
 
+    const handlePreferencesChange = (e) => {
+        setPreferences({ ...preferences, [e.target.name]: e.target.value });
+    };
+
+    // Form submission
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const data = { profile, preferences };
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/step-one-prompts', data);
+            history.push('/results', { state: { data: response.data } });
+        } catch (error) {
+            console.error('Error while fetching prompts:', error);
+            alert('Failed to fetch prompts. Please try again.');
+        }
+    };
+
+    // Simplified form for the example
     return (
         <Container>
             <Form onSubmit={handleSubmit}>
                 <Row className="mb-3">
-                    <Form.Group as={Col} controlId="formGridFirstName">
-                        <Form.Label>First Name <span className="required-asterisk">*</span></Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter first name"
-                            value={firstName}
-                            onChange={e => setFirstName(e.target.value)}
-                        />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId="formGridLastName">
-                        <Form.Label>Last Name <span className="required-asterisk">*</span></Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter last name"
-                            value={lastName}
-                            onChange={e => setLastName(e.target.value)}
-                        />
-                    </Form.Group>
-                </Row>
-
-                <Row className="mb-3">
-                    <Form.Group as={Col} controlId="formGridPhoneNumber">
-                        <Form.Label>Phone Number</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter phone number"
-                            value={phoneNumber}
-                            onChange={e => setPhoneNumber(e.target.value)}
-                        />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId="formGridEmail">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control
-                            type="email"
-                            placeholder="Enter email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
-                    </Form.Group>
-                </Row>
-
-                <Row className="mb-3">
-                    <Form.Group as={Col}>
-                        <Form.Label>Social Media</Form.Label>
-                        <InputGroup>
-                        <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
+                    <Col>
+                        <Form.Group controlId="formName">
+                            <Form.Label>Name</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Username"
-                                value={socialMedia}
-                                onChange={e => setSocialMedia(e.target.value)}
+                                name="name"
+                                value={profile.name}
+                                onChange={handleProfileChange}
+                                placeholder="Enter name"
                             />
-                        </InputGroup>
-                    </Form.Group>
+                        </Form.Group>
+                    </Col>
+                    <Col>
+                        <Form.Group controlId="formAge">
+                            <Form.Label>Age</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="age"
+                                value={profile.age}
+                                onChange={handleProfileChange}
+                                placeholder="Enter age"
+                            />
+                        </Form.Group>
+                    </Col>
                 </Row>
-
-                <Button variant="secondary" type="submit">
-                    Search
-                </Button>
+                {/* Additional fields can be similarly added as needed */}
+                <Button variant="primary" type="submit">Submit</Button>
             </Form>
         </Container>
     );

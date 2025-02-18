@@ -1,0 +1,70 @@
+// Importing Sass modules
+@use 'sass:color';
+@use 'sass:math';
+
+// Define your romantic color palette
+$red-love: #ff5a5f; // A love-red color
+$pink-soft: #fe88a2; // Soft pink
+$gray-soft: #f8f8f8; // Very light gray for backgrounds
+$white-pure: #ffffff; // Pure white
+$black: #000000; // Basic black
+
+// Override Bootstrap's default variables with your custom palette
+$primary: $red-love;
+$secondary: $pink-soft;
+$success: color.scale($primary, $lightness: 20%); // Lighter version of primary for success
+$info: color.scale($secondary, $lightness: 20%); // Lighter version of secondary for info
+$light: $gray-soft;
+$dark: color.scale($black, $lightness: -20%); // Darker shade for dark theme
+$white: $white-pure;
+
+// Import Bootstrap after setting custom variables
+@import '../node_modules/bootstrap/scss/bootstrap';
+
+// Custom styles for your application
+body {
+    background-color: color.scale($light, $lightness: 5%);
+    color: $dark;
+}
+
+.btn-primary {
+    background-color: $primary;
+    border-color: color.scale($primary, $lightness: -10%);
+
+    &:hover {
+        background-color: color.scale($primary, $lightness: -5%);
+    }
+}
+
+.btn-secondary {
+    background-color: $secondary;
+    border-color: color.scale($secondary, $lightness: -10%);
+
+    &:hover {
+        background-color: color.scale($secondary, $lightness: -5%);
+    }
+}
+
+// Additional styles for form elements, cards, etc.
+.card {
+    background-color: $white;
+    box-shadow: 0 4px 6px rgba($black, 0.1);
+}
+
+.form-control {
+    background-color: color.scale($white, $lightness: -5%);
+    border: 1px solid color.scale($black, $lightness: -10%);
+}
+
+// Navigation styling
+.navbar {
+    background-color: color.scale($primary, $lightness: -10%);
+}
+
+// Link styling
+a {
+    color: $secondary;
+    &:hover {
+        color: color.scale($secondary, $lightness: -10%);
+    }
+}

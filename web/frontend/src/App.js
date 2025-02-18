@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import NavBar from './navBar';
 import HomePage from './HomePage';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './mystery.css';
+import './romance.css';
 import ResultsPage from './ResultsPage';
 
 function App() {
