@@ -135,6 +135,33 @@ def step_one(user_data):
         raise Exception("error in step_one():", e)
 
 
+def step_two(user_data, prompts, prompt_answers):
+    try:
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        user_profile_description = f"Profile: {user_data.profile.__dict__}"
+        user_preferences_description = f"Preferences: {user_data.preferences.__dict__}"
+        main_prompt = f"Given this user profile description: {user_profile_description} and preferences description: {user_preferences_description}, You will be given 3 prompts and short answer details to those prompts, rewrite the short answers to be more engaging and interesting ot the users preferences. You can embellish the details as you see fit with the user profile and preferences."
+        
+        temp = []
+        for prompt, answer in zip(prompts, prompt_answers):
+            data = prompt + " : " + answer
+            temp.append(data)
+
+        chat = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": main_prompt},
+            {"role": "user", "content": "\n".join(temp)}
+        ],
+        stream=False,
+        )
+        return chat.choices[0].message.content
+    
+    except Exception as e:
+        raise Exception("error in step_two():", e)
+
+
 def analyze_images(images):
     try:
         keys = get_keys()
@@ -230,4 +257,6 @@ if __name__ == "__main__":
     print(user_preferences_with_optional)
 
     ud = UserData(user_profile_with_optional, user_preferences_with_optional)
-    print("STEP1:", step_one(ud))
+    #print("STEP1:", step_one(ud))
+    print("STEP2:", step_two(ud,["My happy place is", "My biggest date fail", "My BFF's take on why you should date me"], 
+                             ["the beach", "I tripped and fell, spilling my scaling hot coffee on her.", "my BFF says I'm pretty rich and possibly funny"]))

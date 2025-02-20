@@ -112,6 +112,33 @@ def step_one():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+# given the user's response to the prompts, flesh them out and return
+@app.route("/step-one-prompts", methods=["POST"])
+def step_two():
+    try:
+        data = request.json
+        log.debug(f"Step two called with: {data}")
+        profile_data = data.get("profile", {})
+        preferences_data = data.get("preferences", {})
+        prompt_answers = data.get("prompt_answers", [])
+        prompts = data.get("prompts", [])
+        from ..interfaces.send_user_info.send.interface import Profile, Preferences, UserData
+
+        if profile_data and preferences_data and prompt_answers and prompts: # unpack data into profile and preferences
+            user_profile = Profile(**profile_data)
+            user_preferences = Preferences(**preferences_data)
+            user_data = UserData(user_profile, user_preferences)
+
+            from common.Analyzer.parser import step_two
+            fleshed_out_prompts = step_two(user_data, prompt_answers)
+            return jsonify({"prompts": fleshed_out_prompts, "UserData": user_data, "prompts":prompts, "prompt_answers:": prompt_answers}), 200
+        else:
+            return jsonify({"error: something went wrong with unpacking profile and preferences and prompt_answers"}), 400
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 #pretty good example of how to write an api endpoint
 @app.route('/api/so/', methods=['GET'])
 def sexOffenders():
