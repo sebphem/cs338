@@ -3,6 +3,7 @@ interface Profile {
     age: number;
     height: number;
     location: string;
+    preferences?: string;
     dating_intentions?: string[];
     relationship_type?: string[];
     ethnicity?: string[];
@@ -25,23 +26,9 @@ interface Profile {
     drugs?: boolean;
 }
 
-interface Preferences {
-    max_distance: number;
-    age_range: [number, number];
-    relationship_type?: string[];
-    height_range?: [number, number];
-    dating_intentions?: string[];
-    children?: string;
-    family_plans?: string;
-    vices?: string[];
-    politics?: string;
-    education?: string;
-}
-
 interface UserData{
     profile: Profile;
-    preferences: Preferences;
-}
+};
 
 function testUserData() {
     const userProfile: Profile = {
@@ -49,6 +36,7 @@ function testUserData() {
         age: 30,
         height: 180,
         location: "New York",
+        preferences: "I'm looking for a man with a dog",
         dating_intentions: ["Serious", "Casual"],
         relationship_type: ["Monogamous"],
         pets: "Dog",
@@ -56,22 +44,8 @@ function testUserData() {
         drinking: "Occasionally"
     };
 
-    const userPreferences: Preferences = {
-        max_distance: 50,
-        age_range: [25, 35],
-        relationship_type: ["Serious"],
-        height_range: [160, 190],
-        dating_intentions: ["Long-term"],
-        children: "No Preference",
-        family_plans: "Wants kids",
-        vices: ["Drinking"],
-        politics: "Liberal",
-        education: "Graduate Degree"
-    };
-
     const userData: UserData = {
-        profile: userProfile,
-        preferences: userPreferences
+        profile: userProfile
     };
     console.log("user data:" );
     console.log(JSON.stringify(userData));
@@ -87,25 +61,16 @@ function testLowLevelUserData() {
             age: 30,
             height: 180,
             location: "New York",
+            preferences: "I'm looking for a man with a dog",
             dating_intentions: ["Serious", "Casual"],
             relationship_type: ["Monogamous"],
             pets: "Dog",
             smoking: false,
             drinking: "Occasionally"
-        },
-        preferences: {
-            max_distance: 50,
-            age_range: [25, 35],
-            relationship_type: ["Serious"],
-            height_range: [160, 190],
-            dating_intentions: ["Long-term"],
-            children: "No Preference",
-            family_plans: "Wants kids",
-            vices: ["Drinking"],
-            politics: "Liberal",
-            education: "Graduate Degree"
         }
     };
     console.log("user data:" );
     console.log(JSON.stringify(userData));
 }
+
+export {Profile}

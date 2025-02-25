@@ -3,3 +3,4 @@ venv
 node_modules
 keys.yaml
 web/backend/common/api_keys/parser.py
+.vscode

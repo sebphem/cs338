@@ -7,6 +7,7 @@ class Profile:
                  height: int, 
                  location: str, 
                  dating_intentions: Optional[List[str]] = None, 
+                 preferences: Optional[str] = None,
                  relationship_type: Optional[List[str]] = None, 
                  ethnicity: Optional[List[str]] = None, 
                  children: Optional[str] = None, 
@@ -31,6 +32,7 @@ class Profile:
         self.height = height
         self.location = location
         self.dating_intentions = dating_intentions if dating_intentions is not None else []
+        self.preferences = preferences
         self.relationship_type = relationship_type if relationship_type is not None else []
         self.ethnicity = ethnicity if ethnicity is not None else []
         self.children = children
@@ -54,6 +56,26 @@ class Profile:
     def __repr__(self):
         return f"Profile({self.name}, {self.age}, {self.location})"
 
+
+from typing import List, Optional, Tuple
+
+
+class UserData(Profile):
+    def __init__(self, profile: Profile,  prompts: list[str]):
+        self.profile = profile
+        self.prompts = prompts
+
+    def __dict__(self):
+        """
+        Returns a dictionary where 'profile' and 'preferences' are
+        converted to their own dictionary representations.
+        """
+        return {
+            "profile": self.profile.__dict__,
+            "prompts": self.prompts
+        }
+
+
 if __name__== "__main__":
     # Example usage with required fields
     user_profile = Profile(
@@ -63,6 +85,10 @@ if __name__== "__main__":
         location="New York"
     )
     print(user_profile.__dict__)
+
+
+    ud = UserData(user_profile)
+    print(ud.__dict__)
 
     # Example usage with optional fields included
     user_profile_with_optional = Profile(
@@ -78,3 +104,7 @@ if __name__== "__main__":
     )
 
     print(user_profile_with_optional)
+
+
+    ud = UserData(user_profile_with_optional)
+    print(ud.__dict__)
