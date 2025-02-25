@@ -9,7 +9,7 @@ export default function HomePage() {
         <div>
             <h1 className="text-center">Cupidity</h1>
             <p className="text-center">Where every swipe is right.</p>
-            <SearchForm />
+            <RegistrationForm />
         </div>
     );
 }
