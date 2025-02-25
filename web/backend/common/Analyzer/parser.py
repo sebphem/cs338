@@ -1,18 +1,20 @@
 # uses AI to analyze given profile
 from openai import OpenAI
 import os
-from ..api_keys.parser import get_keys
 import re
-def analyze_profile(profile):
+
+def get_keys():
+    return "key_here"
+
+def analyze_profile(pictures, profile):
     try:
-        keys = get_keys()
-        API_KEY = keys["keys"]["OPENAI_API_KEY"]
+        API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         chat = client.chat.completions.create(
             model = "gpt-3.5-turbo",
             messages = [
-                {"role": "system", "content": "You are a psychologist and private investigator. I'm going to hand you a profile and I want you to analyze everything you can off of it. Tell me your reasoning as well."},
-                {"role:":"user", "content": profile}
+                {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile of: {profile}"},
+                {"role:":"user", "content": pictures }
 
             ],
             stream = False,
