@@ -8,9 +8,4 @@ def get_keys():
     """
     Function that opens the config file so you dont have to worry about paths across os
     """
-    with open(Path(os.path.abspath(__file__)).parent / "keys.yaml", "r") as file:
-        return yaml.safe_load(file)
-
-if __name__ == "__main__":
-    config = get_keys()
-    print(config["keys"]["linkedin"])
+    return "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"

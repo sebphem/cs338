@@ -55,39 +55,11 @@ class Profile:
         return f"Profile({self.name}, {self.age}, {self.location})"
 
 
-class Preferences:
-    def __init__(self,
-                 max_distance: int,
-                 age_range: Tuple[int, int],
-                 relationship_type: Optional[List[str]] = None,
-                 height_range: Optional[Tuple[int, int]] = None,
-                 dating_intentions: Optional[List[str]] = None,
-                 children: Optional[str] = None,
-                 family_plans: Optional[str] = None,
-                 vices: Optional[List[str]] = None,
-                 politics: Optional[str] = None,
-                 education: Optional[str] = None):
-        self.max_distance = max_distance
-        self.age_range = age_range
-        self.relationship_type = relationship_type if relationship_type is not None else []
-        self.height_range = height_range
-        self.dating_intentions = dating_intentions if dating_intentions is not None else []
-        self.children = children
-        self.family_plans = family_plans
-        self.vices = vices if vices is not None else []
-        self.politics = politics
-        self.education = education
-
-    def __repr__(self):
-        return f"Preferences(Max Distance: {self.max_distance}, Age Range: {self.age_range})"
-
-
 class UserData:
-    def __init__(self, profile: Profile, preferences: Preferences, images: Optional[List[str]] = None, prompts_filled: Optional[dict[str,str]] = None):
+    def __init__(self, profile: Profile, images: Optional[List[str]] = None, prompts_filled: Optional[dict[str,str]] = None):
         self.profile = profile
-        self.preferences = preferences
         self.images = images if images is not None else []
         self.prompts_filled = prompts_filled if prompts_filled is not None else []
 
     def __repr__(self):
-        return f"UserData(Profile: {self.profile}, Preferences: {self.preferences}, Images: {len(self.images)} images, Prompts: {len(self.prompts_filled)} prompts)"
+        return f"UserData(Profile: {self.profile}, Images: {len(self.images)} images, Prompts: {len(self.prompts_filled)} prompts)"

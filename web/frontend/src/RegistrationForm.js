@@ -12,6 +12,7 @@ function RegistrationForm() {
             height: 0,
             location: '',
             dating_intentions: [],
+            preferences: '',
             relationship_type: [],
             ethnicity: [],
             children: '',
@@ -32,18 +33,6 @@ function RegistrationForm() {
             weed: false,
             drugs: false
         },
-        preferences: {
-            max_distance: 0,
-            age_range: [18, 100],
-            relationship_type: [],
-            height_range: [0, 300],
-            dating_intentions: [],
-            children: '',
-            family_plans: '',
-            vices: [],
-            politics: '',
-            education: ''
-        }
     });
 
     const handleInputChange = (event) => {
@@ -200,7 +189,7 @@ function RegistrationForm() {
                                 </Form.Group>
                                 {/* <Form.Group>
                                     <Form.Label>Smoking</Form.Label>
-                                    <Form.Check 
+                                    <Form.Check
                                         type="checkbox"
                                         label="Uses cigs"
                                         name="profile.smoking"
@@ -212,7 +201,7 @@ function RegistrationForm() {
                                 </Form.Group>
                                 <Form.Group>
                                     <Form.Label>Weed</Form.Label>
-                                    <Form.Check 
+                                    <Form.Check
                                         type="checkbox"
                                         label="Uses weed"
                                         name="profile.weed"
@@ -240,13 +229,10 @@ function RegistrationForm() {
                         {step === 3 && (
                             <>
                                 <h4>Finally, tell us about your preferences</h4>
+                                <p>This could be as simple as simple or complex as you would like (age, height, location, etc.)</p>
                                 <Form.Group>
-                                    <Form.Label>Max Distance</Form.Label>
-                                    <Form.Control type="number" name="preferences.max_distance" value={formData.preferences.max_distance} onChange={handleInputChange} />
-                                </Form.Group>
-                                <Form.Group>
-                                    <Form.Label>Age Range</Form.Label>
-                                    <Form.Control type="text" placeholder="18-100" name="preferences.age_range" value={formData.preferences.age_range.join('-')} onChange={handleInputChange} />
+                                    <Form.Label>Preferences</Form.Label>
+                                    <Form.Control type="text" name="profile.preferences" value={formData.profile.preferences} onChange={handleInputChange} />
                                 </Form.Group>
                                 {/* Continue adding preference fields as needed */}
                                 <Button type="submit" className="mt-3 mb-3" variant="success">Submit</Button>

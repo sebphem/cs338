@@ -36,8 +36,7 @@ def step_one(user_data):
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         user_profile_description = f"Profile: {user_data.profile.__dict__}"
-        user_preferences_description = f"Preferences: {user_data.preferences.__dict__}"
-        main_prompt = f"Given this user profile description: {user_profile_description} and preferences description: {user_preferences_description}, please tell me the top 3 prompts that match this user:"
+        main_prompt = f"Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user:"
         chat_prompts = [
     "Gender euphoria looks like",
     "Dating me is like",
@@ -140,13 +139,9 @@ def step_two(user_data, prompts, prompt_answers):
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         user_profile_description = f"Profile: {user_data.profile.__dict__}"
-        user_preferences_description = f"Preferences: {user_data.preferences.__dict__}"
-        main_prompt = f"Given this user profile description: {user_profile_description} and preferences description: {user_preferences_description}, You will be given 3 prompts and short answer details to those prompts, rewrite the short answers to be more engaging and interesting ot the users preferences. You can embellish the details as you see fit with the user profile and preferences."
+        main_prompt = f"Given this user profile description: {user_profile_description}, You will be given 3 prompts and short answer details to those prompts, rewrite the short answers to be more engaging and interesting ot the users preferences. You can embellish the details as you see fit with the user profile and preferences."
         
-        temp = []
-        for prompt, answer in zip(prompts, prompt_answers):
-            data = prompt + " : " + answer
-            temp.append(data)
+        temp = [f"{prompt} : {answer}" for prompt,answer in zip(prompts,prompt_answers) ]
 
         chat = client.chat.completions.create(
         model="gpt-4o",
@@ -160,40 +155,6 @@ def step_two(user_data, prompts, prompt_answers):
     
     except Exception as e:
         raise Exception("error in step_two():", e)
-
-
-def analyze_images(images):
-    try:
-        keys = get_keys()
-        API_KEY = keys["keys"]["OPENAI_API_KEY"]
-        responses = []
-        client = OpenAI(api_key=API_KEY)
-
-        for image in images:
-            image_format = png_or_jpg(image)
-            if image_format == None:
-                return None # give back to endpoint
-            
-            image_dataurl = f"data:image/{image_format};base64,{image}"
-
-            # gpt-4-vision is the one that recognizes images, can't use other models sadly
-            response = client.chat.completions.create(
-                model="gpt-4-vision-preview",
-                messages=[
-                    {"role": "user", "content": [
-                        {"type": "text", "text": "Can you analyze what the person is doing in this image? and what else they may enjoy doing?"},
-                        {"type": "image_url", "image_url": {"url": image_dataurl}}
-                    ]}
-                ]
-            )
-        responses.append(response.choices[0].message.content) # add the analysis to arr
-
-        return responses
-
-
-    except Exception as e:
-        raise Exception("error in analyze images:", e)    
-
 
 if __name__ == "__main__":
     text = """

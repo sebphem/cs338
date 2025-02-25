@@ -5,9 +5,9 @@ class Profile:
                  name: str, 
                  age: int, 
                  height: int, 
-                 location: str,
-                 preferences: Optional[str] = None,
+                 location: str, 
                  dating_intentions: Optional[List[str]] = None, 
+                 preferences: Optional[str] = None,
                  relationship_type: Optional[List[str]] = None, 
                  ethnicity: Optional[List[str]] = None, 
                  children: Optional[str] = None, 
@@ -59,10 +59,38 @@ class Profile:
 
 from typing import List, Optional, Tuple
 
+class Preferences:
+    def __init__(self,
+                 max_distance: int,
+                 age_range: Tuple[int, int],
+                 relationship_type: Optional[List[str]] = None,
+                 height_range: Optional[Tuple[int, int]] = None,
+                 dating_intentions: Optional[List[str]] = None,
+                 children: Optional[str] = None,
+                 family_plans: Optional[str] = None,
+                 vices: Optional[List[str]] = None,
+                 politics: Optional[str] = None,
+                 education: Optional[str] = None):
+        self.max_distance = max_distance
+        self.age_range = age_range
+        self.relationship_type = relationship_type if relationship_type is not None else []
+        self.height_range = height_range
+        self.dating_intentions = dating_intentions if dating_intentions is not None else []
+        self.children = children
+        self.family_plans = family_plans
+        self.vices = vices if vices is not None else []
+        self.politics = politics
+        self.education = education
 
-class UserData(Profile):
-    def __init__(self, profile: Profile):
+    def __repr__(self):
+        return f"Preferences(Max Distance: {self.max_distance}, Age Range: {self.age_range})"
+
+
+class UserData(Profile, Preferences):
+    def __init__(self, profile: Profile, preferences: Preferences, prompts: list[str]):
         self.profile = profile
+        self.preferences = preferences
+        self.prompts = prompts
 
     def __dict__(self):
         """
@@ -70,8 +98,11 @@ class UserData(Profile):
         converted to their own dictionary representations.
         """
         return {
-            "profile": self.profile.__dict__
+            "profile": self.profile.__dict__,
+            "preferences": self.preferences.__dict__,
+            "prompts": self.prompts
         }
+
 
 if __name__== "__main__":
     # Example usage with required fields
@@ -83,8 +114,14 @@ if __name__== "__main__":
     )
     print(user_profile.__dict__)
 
+     # Example usage with required fields
+    user_preferences = Preferences(
+        max_distance=50,
+        age_range=(25, 35)
+    )
+    print(user_preferences.__dict__)
 
-    ud = UserData(user_profile)
+    ud = UserData(user_profile, user_preferences)
     print(ud.__dict__)
 
     # Example usage with optional fields included
@@ -101,3 +138,22 @@ if __name__== "__main__":
     )
 
     print(user_profile_with_optional)
+
+    # Example usage with optional fields included
+    user_preferences_with_optional = Preferences(
+        max_distance=100,
+        age_range=(30, 40),
+        relationship_type=["Serious", "Casual"],
+        height_range=(160, 190),
+        dating_intentions=["Long-term", "Marriage"],
+        children="No Preference",
+        family_plans="Wants kids",
+        vices=["Smoking", "Drinking"],
+        politics="Liberal",
+        education="Graduate Degree"
+    )
+    
+    print(user_preferences_with_optional)
+
+    ud = UserData(user_profile_with_optional, user_preferences_with_optional)
+    print(ud.__dict__)
