@@ -6,12 +6,12 @@ import re
 def get_keys():
     return "key_here"
 
-def analyze_profile(pictures, profile):
+def analyze_pictures(pictures, profile):
     try:
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         chat = client.chat.completions.create(
-            model = "gpt-3.5-turbo",
+            model = "gpt-4o",
             messages = [
                 {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile of: {profile}"},
                 {"role:":"user", "content": pictures }
