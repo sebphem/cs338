@@ -239,14 +239,14 @@ function RegistrationForm() {
                         )}
                         {step === 3 && (
                             <>
-                                <h4>Finally, tell us about your preferences</h4>
+                                <h4>Finally, tell us about your preferences...to be developed</h4>
                                 <Form.Group>
                                     <Form.Label>Max Distance</Form.Label>
-                                    <Form.Control type="number" name="preferences.max_distance" value={formData.preferences.max_distance} onChange={handleInputChange} />
+                                    {/* <Form.Control type="number" name="preferences.max_distance" value={formData.preferences.max_distance} onChange={handleInputChange} /> */}
                                 </Form.Group>
                                 <Form.Group>
                                     <Form.Label>Age Range</Form.Label>
-                                    <Form.Control type="text" placeholder="18-100" name="preferences.age_range" value={formData.preferences.age_range.join('-')} onChange={handleInputChange} />
+                                    {/* <Form.Control type="text" placeholder="18-100" name="preferences.age_range" value={formData.preferences.age_range.join('-')} onChange={handleInputChange} /> */}
                                 </Form.Group>
                                 {/* Continue adding preference fields as needed */}
                                 <Button type="submit" className="mt-3 mb-3" variant="success">Submit</Button>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import SearchForm from './SearchForm';
 import { useHistory } from 'react-router-dom';
 import GetStartedForm from './RegistrationForm.js';
 import RegistrationForm from './RegistrationForm.js';

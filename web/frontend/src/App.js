@@ -7,6 +7,8 @@ import HomePage from './HomePage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './romance.css';
 import ResultsPage from './ResultsPage';
+import EnhancedPromptsPage from './EnhancedPrompts';
+// import { UserFormProvider } from './contexts/UserFormContext';
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route exact path="/results" component={ResultsPage} />
+        <Route exact path="/enhanced-prompts" component={EnhancedPromptsPage} />
       </Switch>
     </Router>
   );
