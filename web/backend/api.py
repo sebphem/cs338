@@ -34,7 +34,7 @@ def step_one():
             top_prompts = step_one(user_profile)
             return jsonify({"prompts": top_prompts, "profile":user_profile}), 200
         else:
-            return jsonify({"error: something went wrong with unpacking profile"}), 400
+            return jsonify({"error": "something went wrong with unpacking profile", "data":data}), 400
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -58,7 +58,29 @@ def step_two():
             fleshed_out_prompts = step_two(user_profile, prompts, prompt_answers)
             return jsonify({"fleshed_out_prompts": fleshed_out_prompts, "profile":user_profile, "prompt_answers:": prompt_answers}), 200
         else:
-            return jsonify({"error: something went wrong with unpacking profile and preferences and prompt_answers"}), 400
+            return jsonify({"error": "something went wrong with unpacking profile and preferences and prompt_answers", "data":data}), 400
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# called with POST and give the user profile and an array of dataurl pictures
+@app.route("/best-picture", methods=["POST"])
+def best_picture():
+    try:
+        data = request.json
+        log.debug(f"best_picture called with: {data}")
+        profile_data = data.get("profile", {}) # type: ignore
+        pictures = data.get("pictures", [])
+        from interface import Profile
+
+        if profile_data and pictures: # unpack data into profile and preferences
+            user_profile = Profile(**profile_data)
+
+            from common.Analyzer.parser import analyze_pictures
+            best_picture = analyze_pictures(profile_data, pictures)
+            return jsonify({"picture": best_picture, "profile":user_profile}), 200
+        else:
+            return jsonify({"error": "something went wrong with unpacking profile or pictures was empty", "data:": data}), 400
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
