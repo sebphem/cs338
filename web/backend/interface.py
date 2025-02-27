@@ -6,7 +6,7 @@ class Profile:
                  age: int, 
                  height: int, 
                  location: str,
-                 preferences: Optional[str] = None,
+                 preferences: Optional[str] = "",
                  dating_intentions: Optional[List[str]] = None, 
                  relationship_type: Optional[List[str]] = None, 
                  ethnicity: Optional[List[str]] = None, 
