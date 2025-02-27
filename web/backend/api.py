@@ -94,7 +94,7 @@ def conversation_answer():
         profile = data.get("profile", {})
         chat_history = data.get("history", None)
         user_answer = data.get("user_answer", None)
-        profile["preferences"] += user_answer
+        profile["preferences"] += " " + user_answer
         user_answer = "YOU:" + user_answer
 
         if not profile or not chat_history or not user_answer:
