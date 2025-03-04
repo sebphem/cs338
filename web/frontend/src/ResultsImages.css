@@ -1,0 +1,97 @@
+.image-container {
+    width: 400px;  /* Set a uniform width */
+    height: 400px; /* Set a uniform height */
+    overflow: hidden; /* Prevents overflowing */
+    text-align: center;
+    border-radius: 10px;
+  }
+  
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image fills the space without distortion */
+    border-radius: 10px; /* Optional: rounded corners */
+    
+  }
+
+  .iphone-container {
+    
+    /*width: 375px; /* iPhone 12/13/14 standard width */
+    /*height: 812px; /* iPhone 12/13/14 standard height */
+    border-radius: 40px; /* Smooth rounded edges */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow like iPhone */
+    overflow: hidden; /* Prevent content from overflowing */
+    background: white;
+    
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /*border: 5px solid #000; /* Black border like an iPhone frame */    
+  }
+
+  .rounded-card {
+    border-radius: 10px;
+    width: 400px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+  }
+
+  .iphone-simulation {
+    width: 450px;
+    text-align: center;
+    margin: 10px 20px;
+  }
+
+
+  .center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+   
+  }
+
+  .card-header-styling:hover {
+
+    border-bottom: 3px solid rgb(140,92,129); /* Custom thickness & color */
+    display: inline-block; /* Ensures underline follows text width */
+    padding-bottom: 5px;    
+    color: rgb(140,92,129);
+    font-weight: bold;
+
+  }
+
+  .padding-pronouns {
+
+    padding-top: 10px;  
+
+  }
+
+  @font-face {
+    font-family: "Munika Light";
+    src: url("/munika-light.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .custom-font {
+    font-family: "Munika Light", sans-serif;
+    }
+
+
+  .prompts {
+
+    /*Placeholder*/    
+    font-family: "Munika Light", sans-serif;
+
+
+
+  }
+
+
+
+
+
+  

@@ -8,20 +8,20 @@ export default function About() {
                 <Card.Body>
                     <h1>About Cupidity</h1>
                     <p>
-                        Welcome to <strong>Cupidity</strong>, a platform designed to bring meaningful connections to life.
-                        Our mission is to help you find like-minded individuals based on shared interests and values.
+                        Welcome to <strong>Cupidity</strong>, a platform designed to help you design the perfect dating profile.
+                        Our mission is to help you show the best version of yourself and attract the person of your dreams.
                     </p>
                     
                     <h3>Why Choose Us?</h3>
                     <ul>
-                        <li>✅ Smart matching system</li>
-                        <li>✅ User-friendly experience</li>
-                        <li>✅ Genuine connections</li>
+                        <li>✅ Smart image selection system</li>
+                        <li>✅ Optimizing prompt selection and answers </li>
+                        <li>✅ AI-powered image enhancement</li>
                     </ul>
 
                     <h3>Our Story</h3>
                     <p>
-                        Founded in 2025, Cupidity was built to redefine online dating by focusing on real personalities and meaningful conversations.
+                        Founded in 2025, Cupidity was built to redefine online dating by helping users present the best versions of themselves.
                     </p>
                     
                     <h3>Get Started</h3>
