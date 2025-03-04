@@ -37,7 +37,7 @@ def step_one(user_data):
     try:
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
-        user_profile_description = f"Profile: {user_data.profile.__dict__}"
+        user_profile_description = f"Profile: {user_data.__dict__}"
         main_prompt = f"Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user. Keep in mind the guidelines we have designed specified in all caps ended with a colon start now:"
         chat_prompts = [ "RULES AND GUIDELINES:",
     "Gender euphoria looks like",
@@ -132,7 +132,8 @@ def step_one(user_data):
                            "You shouldn’t include : Machu Picchu ,'Just ask', basic Pet peeves like 'Slow walkers', Any reference to The Office, Any reference to The Office ",
                            "Don’t be vague in prompts",
                            "Try to avoid politics",
-                           "While keeping it brief and concise, avoid one to two word answers that can be considered boring"
+                           "While keeping it brief and concise, avoid one to two word answers that can be considered boring",
+                           "Keep it casual and sound like a 20ish year old"
                            ]
         chat = client.chat.completions.create(
         model="gpt-4o",
@@ -154,7 +155,7 @@ def step_two(user_data, prompts):
     try:
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
-        user_profile_description = f"Profile: {user_data.profile.__dict__}"
+        user_profile_description = f"Profile: {user_data.__dict__}"
         tips_and_tricks = ["Keep the profile prompt responses short, concise, and witty.", 
                            "Boldness",
                            "Honesty",
@@ -253,6 +254,6 @@ if __name__ == "__main__":
     #print(user_preferences_with_optional)
 
     #ud = UserData(user_profile_with_optional, user_preferences_with_optional)
-    #print("STEP1:", step_one(ud))
-    #print("STEP2:", step_two(ud,["My happy place is", "My biggest date fail", "My BFF's take on why you should date me"], 
-                             #["the beach", "I tripped and fell, spilling my scaling hot coffee on her.", "my BFF says I'm pretty rich and possibly funny"]))
+    prompts = step_one(Profile(**user_profile_with_optional))
+    print("STEP1:", prompts)
+    #print("STEP2:", step_two(Profile(**user_profile_with_optional)), prompts)
