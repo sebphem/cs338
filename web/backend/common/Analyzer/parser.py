@@ -38,8 +38,8 @@ def step_one(user_data):
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         user_profile_description = f"Profile: {user_data.profile.__dict__}"
-        main_prompt = f"Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user:"
-        chat_prompts = [
+        main_prompt = f"Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user. Keep in mind the guidelines we have designed specified in all caps ended with a colon start now:"
+        chat_prompts = [ "RULES AND GUIDELINES:",
     "Gender euphoria looks like",
     "Dating me is like",
     "What I order for the table",
@@ -121,10 +121,24 @@ def step_one(user_data):
     "I bet you can't",
     "I know the best spot in town for"
 ]
+        tips_and_tricks = ["Keep the profile prompt responses short, concise, and witty.", 
+                           "Boldness",
+                           "Honesty",
+                           "A genuine personality",
+                           "Answer Prompts in Ways That Will Intrigue Your Ideal Match",
+                           "Be respectful",
+                           "Don’t be a stereotype",
+                           "Don’t be sexual in a disrespectful way",
+                           "You shouldn’t include : Machu Picchu ,'Just ask', basic Pet peeves like 'Slow walkers', Any reference to The Office, Any reference to The Office ",
+                           "Don’t be vague in prompts",
+                           "Try to avoid politics",
+                           "While keeping it brief and concise, avoid one to two word answers that can be considered boring"
+                           ]
         chat = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": main_prompt},
+            {"role": "system", "content": "\n".join(tips_and_tricks)},
             {"role": "user", "content": "\n".join(chat_prompts)}
         ],
         stream=False,
@@ -136,20 +150,33 @@ def step_one(user_data):
         raise Exception("error in step_one():", e)
 
 
-def step_two(user_data, prompts, prompt_answers):
+def step_two(user_data, prompts):
     try:
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         user_profile_description = f"Profile: {user_data.profile.__dict__}"
-        main_prompt = f"Given this user profile description: {user_profile_description}, You will be given 3 prompts and short answer details to those prompts, rewrite the short answers to be more engaging and interesting ot the users preferences. You can embellish the details as you see fit with the user profile and preferences."
+        tips_and_tricks = ["Keep the profile prompt responses short, concise, and witty.", 
+                           "Boldness",
+                           "Honesty",
+                           "A genuine personality",
+                           "Answer Prompts in Ways That Will Intrigue Your Ideal Match",
+                           "Be respectful",
+                           "Don’t be a stereotype",
+                           "Don’t be sexual in a disrespectful way",
+                           "You shouldn’t include : Machu Picchu ,'Just ask', basic Pet peeves like 'Slow walkers', Any reference to The Office, Any reference to The Office ",
+                           "Don’t be vague in prompts",
+                           "Try to avoid politics",
+                           "While keeping it brief and concise, avoid one to two word answers that can be considered boring"
+                           ]
+        main_prompt = f"Given this user profile description: {user_profile_description}, You will be given 3 prompts and short answer details to those prompts, rewrite the short answers to be more engaging and interesting ot the users preferences. You can embellish the details as you see fit with the user profile and preferences. Keep in mind the guidelines specified by all caps ending with a colon. start now:"
         
-        temp = [f"{prompt} : {answer}" for prompt,answer in zip(prompts,prompt_answers) ]
 
         chat = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": main_prompt},
-            {"role": "user", "content": "\n".join(temp)}
+            {"role": "system", "content": "\n".join(tips_and_tricks)},
+            {"role": "system", "content": "Here are my prompts:" + prompts}
         ],
         stream=False,
         )
@@ -208,7 +235,7 @@ if __name__ == "__main__":
     )
     user_profile_with_optional = user_profile_with_optional.__dict__
 
-    chat_history = "CHATGPT: What are your hobbies?\n YOU: I enjoy long walks on the beach\n CHATGPT: That's great! I currently don't have legs nor a body to walk with but is that important? Is it important for your partner to also enjoy walks on the beach?"
+    chat_history = "CHATGPT: What are your hobbies?\nYOU: I enjoy long walks on the beach\nCHATGPT: That's great! I currently don't have legs nor a body to walk with but is that important? Is it important for your partner to also enjoy walks on the beach?"
     user_answer =  "YOU: Not necessarily, but it would be cool if they were."
     while True:
         if user_answer == "quit":
@@ -216,8 +243,9 @@ if __name__ == "__main__":
         chat_history += "\n" + "YOU:" + user_answer
         user_profile_with_optional["preferences"] += " " +user_answer
         print("\nhistory:", chat_history, "\n")
-
-        print(convo_answer(user_profile_with_optional, chat_history, user_answer))
+        ans = convo_answer(user_profile_with_optional, chat_history, user_answer)
+        chat_history += "\n" + ans
+        print(ans)
         user_answer = input()
 
 
