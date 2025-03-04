@@ -34,7 +34,7 @@ def step_one():
             top_prompts = step_one(user_profile)
             return jsonify({"prompts": top_prompts, "profile":user_profile}), 200
         else:
-            return jsonify({"error": "something went wrong with unpacking profile", "data":data}), 400
+            return jsonify({"error step_one": "something went wrong with unpacking profile", "data":data}), 400
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -84,6 +84,37 @@ def best_picture():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# called with POST and starts a conversation to fill in details about the user
+@app.route("/convo_answer", methods=["POST"])
+def conversation_answer():
+    try:
+        data = request.json
+        log.debug(f"convo_ans called with: {data}")
+        profile = data.get("profile", {})
+        chat_history = data.get("history", None)
+        user_answer = data.get("user_answer", None)
+        profile["preferences"] += " " + user_answer
+        user_answer = "YOU:" + user_answer
+
+        if not profile or not chat_history or not user_answer:
+            return jsonify({"error": "expected profile, history, and user_answer", "data": data}),400
+        
+
+        from common.Analyzer.parser import convo_answer
+
+        ans = convo_answer(profile, chat_history, user_answer)
+        chat_history += user_answer
+        return jsonify({"profile": profile, "history": chat_history, "response": ans}), 200
+
+        return 
+
+
+        
+
+    except Exception as e:
+        return jsonify({"error in convo": str(e)}), 500
+
 
 @app.route('/', methods=['GET'])
 def list_endpoints():

@@ -4,7 +4,7 @@ import os
 import re
 
 def get_keys():
-    return "key_here"
+    return "KEY_HERE"
 
 def analyze_pictures(pictures, profile):
     try:
@@ -158,6 +158,29 @@ def step_two(user_data, prompts, prompt_answers):
     except Exception as e:
         raise Exception("error in step_two():", e)
 
+def convo_answer(user_profile, chat_history, user_answer):
+    try:
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        main_prompt = f"You will be given a chat history (with you and the user in the past) and I want you to pretend to continue off from where you left off, keep in mind their profile {user_profile}. Everything you said will be prefaced with 'CHATGPT' and everything they say is prefaced with 'YOU' history:{chat_history}"
+        
+        prompt = "Generate a response to the user that sounds like you understand them within the context of course, and follow up with a follow-up question with the intention of getting more information out of them to fill out the user_profile. try to make it a slightly different question than ones already asked in history"
+
+        chat = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": main_prompt},
+            {"role": "user", "content": prompt}
+        ],
+        stream=False,
+        )
+
+        ans = chat.choices[0].message.content
+        return ans
+    
+    except Exception as e:
+        raise Exception("error in convo_answer():", e)
+
 if __name__ == "__main__":
     text = """
     Last Name: Smith
@@ -167,27 +190,9 @@ if __name__ == "__main__":
     Twitter: Follows family and friends; follows Capcom; follows Barack Obama; 42 posts in the last month
     Hobbies: plays Tennis;
     Crimes: None found"""
-    from interface import Profile, Preferences, UserData
+    from interface import Profile
     #print(analyze_profile(text))
     # Example usage with required fields
-    user_profile = Profile(
-        name="John Doe",
-        age=30,
-        height=180,
-        location="New York"
-    )
-    print(user_profile.__dict__)
-
-     # Example usage with required fields
-    user_preferences = Preferences(
-        max_distance=50,
-        age_range=(25, 35)
-    )
-    print(user_preferences.__dict__)
-
-    ud = UserData(user_profile, user_preferences)
-    print(ud.__dict__)
-
     # Example usage with optional fields included
     user_profile_with_optional = Profile(
         name="Jane Smith",
@@ -197,29 +202,29 @@ if __name__ == "__main__":
         dating_intentions=["Casual"],
         relationship_type=["Open"],
         pets="Cat",
+        preferences = "",
         smoking=True,
         drinking="Occasionally"
     )
+    user_profile_with_optional = user_profile_with_optional.__dict__
 
-    print(user_profile_with_optional)
+    chat_history = "CHATGPT: What are your hobbies?\n YOU: I enjoy long walks on the beach\n CHATGPT: That's great! I currently don't have legs nor a body to walk with but is that important? Is it important for your partner to also enjoy walks on the beach?"
+    user_answer =  "YOU: Not necessarily, but it would be cool if they were."
+    while True:
+        if user_answer == "quit":
+            break
+        chat_history += "\n" + "YOU:" + user_answer
+        user_profile_with_optional["preferences"] += " " +user_answer
+        print("\nhistory:", chat_history, "\n")
 
-    # Example usage with optional fields included
-    user_preferences_with_optional = Preferences(
-        max_distance=100,
-        age_range=(30, 40),
-        relationship_type=["Serious", "Casual"],
-        height_range=(160, 190),
-        dating_intentions=["Long-term", "Marriage"],
-        children="No Preference",
-        family_plans="Wants kids",
-        vices=["Smoking", "Drinking"],
-        politics="Liberal",
-        education="Graduate Degree"
-    )
-    
-    print(user_preferences_with_optional)
+        print(convo_answer(user_profile_with_optional, chat_history, user_answer))
+        user_answer = input()
 
-    ud = UserData(user_profile_with_optional, user_preferences_with_optional)
+
+    print(f"CHAT ENDED! information gathered: {user_profile_with_optional["preferences"]}")
+    #print(user_preferences_with_optional)
+
+    #ud = UserData(user_profile_with_optional, user_preferences_with_optional)
     #print("STEP1:", step_one(ud))
-    print("STEP2:", step_two(ud,["My happy place is", "My biggest date fail", "My BFF's take on why you should date me"], 
-                             ["the beach", "I tripped and fell, spilling my scaling hot coffee on her.", "my BFF says I'm pretty rich and possibly funny"]))
+    #print("STEP2:", step_two(ud,["My happy place is", "My biggest date fail", "My BFF's take on why you should date me"], 
+                             #["the beach", "I tripped and fell, spilling my scaling hot coffee on her.", "my BFF says I'm pretty rich and possibly funny"]))
