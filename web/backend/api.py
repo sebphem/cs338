@@ -115,7 +115,7 @@ def conversation_answer():
         return jsonify({"error in convo": str(e)}), 500
     
 # called with POST and starts a conversation to fill in details about the user
-@app.route("/convo_answer", methods=["POST"])
+@app.route("/redditscrape", methods=["POST"])
 def scrape_reddit():
     try:
         data = request.json
