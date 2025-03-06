@@ -4,7 +4,7 @@ import os
 import re
 
 def get_keys():
-    return "KEY_HERE"
+    return "key"
 
 def analyze_pictures(pictures, profile):
     try:
@@ -37,7 +37,7 @@ def step_one(user_data):
     try:
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
-        user_profile_description = f"Profile: {user_data.__dict__}"
+        user_profile_description = f"Profile: {user_data}"
         main_prompt = f"Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user. Keep in mind the guidelines we have designed specified in all caps ended with a colon start now:"
         chat_prompts = [ "RULES AND GUIDELINES:",
     "Gender euphoria looks like",
@@ -155,7 +155,7 @@ def step_two(user_data, prompts):
     try:
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
-        user_profile_description = f"Profile: {user_data.__dict__}"
+        user_profile_description = f"Profile: {user_data}"
         tips_and_tricks = ["Keep the profile prompt responses short, concise, and witty.", 
                            "Boldness",
                            "Honesty",
@@ -254,6 +254,6 @@ if __name__ == "__main__":
     #print(user_preferences_with_optional)
 
     #ud = UserData(user_profile_with_optional, user_preferences_with_optional)
-    prompts = step_one(Profile(**user_profile_with_optional))
+    prompts = step_one(user_profile_with_optional)
     print("STEP1:", prompts)
     #print("STEP2:", step_two(Profile(**user_profile_with_optional)), prompts)

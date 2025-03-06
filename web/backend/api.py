@@ -25,10 +25,9 @@ def step_one():
         data = request.json
         log.debug(f"Step one called with: {data}")
         profile_data = data.get("profile", {}) # type: ignore
-        from interface import Profile
 
         if profile_data: # unpack data into profile and preferences
-            user_profile = Profile(**profile_data)
+            user_profile = profile_data
 
             from common.Analyzer.parser import step_one
             top_prompts = step_one(user_profile)
