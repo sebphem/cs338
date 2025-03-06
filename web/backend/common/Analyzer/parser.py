@@ -242,10 +242,10 @@ if __name__ == "__main__":
         if user_answer == "quit":
             break
         chat_history += "\n" + "YOU:" + user_answer
-        user_profile_with_optional["preferences"] += " " +user_answer
         print("\nhistory:", chat_history, "\n")
         ans = convo_answer(user_profile_with_optional, chat_history, user_answer)
         chat_history += "\n" + ans
+        user_profile_with_optional["preferences"] += " " +user_answer + " " + ans
         print(ans)
         user_answer = input()
 
