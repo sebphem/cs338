@@ -113,6 +113,26 @@ def conversation_answer():
 
     except Exception as e:
         return jsonify({"error in convo": str(e)}), 500
+    
+# called with POST and starts a conversation to fill in details about the user
+@app.route("/convo_answer", methods=["POST"])
+def scrape_reddit():
+    try:
+        data = request.json
+        log.debug(f"scrape_reddit called with: {data}")
+        username = data.get("username", None)
+        if not username:
+            return jsonify({"error": "Expected your JSON to have 'username'"}),400
+
+        from common.Analyzer.parser import scrape_redditaccount
+        ans = scrape_redditaccount(username)
+        return jsonify({"response:": ans}), 200
+
+
+        
+
+    except Exception as e:
+        return jsonify({"error in reddit scrape": str(e)}), 500
 
 
 @app.route('/', methods=['GET'])

@@ -5,3 +5,4 @@ pandas
 pyyaml
 sqlite3==3.45.3
 openai
+praw
