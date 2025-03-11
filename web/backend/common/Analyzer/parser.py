@@ -134,7 +134,7 @@ def step_one(user_data):
                            "Don’t be vague in prompts",
                            "Try to avoid politics",
                            "While keeping it brief and concise, avoid one to two word answers that can be considered boring",
-                           "Keep it casual and sound like a 20ish year old"
+                           "Keep it casual and sound like a 20ish year old",
                            ]
         chat = client.chat.completions.create(
         model="gpt-4o",
@@ -225,8 +225,8 @@ def scrape_redditaccount(username):
         redditor = reddit.redditor(username)
 
         # Fetch X amount of posts and comments
-        posts = list(redditor.submissions.new(limit=20))
-        comments = list(redditor.comments.new(limit=40))
+        posts = list(redditor.submissions.new(limit=50))
+        comments = list(redditor.comments.new(limit=100))
 
         # Combine posts and comments into a single text block
         raw_text = ""
@@ -284,7 +284,7 @@ def scrape_redditaccount(username):
         stream=False,
         )
         ans = chat.choices[0].message.content
-        #print("\nPROFILE GENERATED:", ans, "\n")
+        print("\nPROFILE GENERATED:", ans, "\n")
         return step_one(ans)
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
