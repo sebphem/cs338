@@ -330,7 +330,7 @@ if __name__ == "__main__":
         user_answer = input()
 
 
-    print(f"CHAT ENDED! information gathered:", user_profile_with_optional["preferences"])
+    print(f"CHAT ENDED! information gathered: {user_profile_with_optional["preferences"]}")
     #print(user_preferences_with_optional)
 
     #ud = UserData(user_profile_with_optional, user_preferences_with_optional)

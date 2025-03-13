@@ -7,19 +7,22 @@ function ResultsPage() {
     const history = useHistory();
     const [prompts, setPrompts] = useState([]);
     const [responses, setResponses] = useState({});
+    // const [profile, setProfile] = useState({});
 
     useEffect(() => {
+        console.log(location.state);
         const promptString = location.state?.prompts;
         if (promptString) {
-            const matches = promptString.match(/"([^"]*)"/g);
-            if (matches) {
-                const initialResponses = matches.reduce((acc, prompt) => ({
-                    ...acc,
-                    [prompt]: ''  // Ensure initial value is an empty string, not undefined
-                }), {});
-                setPrompts(matches.map(match => match.replace(/"/g, '')));
-                setResponses(initialResponses);
-            }
+            // Splitting the promptString by two newlines to separate each prompt
+            const splitPrompts = promptString.split(/\n\n/);
+            setPrompts(splitPrompts);
+
+            // Creating initial responses object
+            const initialResponses = splitPrompts.reduce((acc, prompt) => ({
+                ...acc,
+                [prompt]: '' // Initialize responses with empty strings
+            }), {});
+            setResponses(initialResponses);
         }
     }, [location]);
     
@@ -32,29 +35,7 @@ function ResultsPage() {
         const payload = {
             prompts: prompts,  // Directly use prompts if it's already an array
             prompt_answers: Object.values(responses),  // This should be an array of responses
-            profile: {  // Hardcoded user profile data
-                name: "Ryan",
-                age: 20,
-                height: 172,
-                location: "Chicago",
-                dating_intentions: ["Long-term"],
-                relationship_type: ["Serious"],
-                pets: "None",
-                smoking: false,
-                drinking: "Socially"
-            },
-            preferences: {  // Hardcoded user preferences data
-                max_distance: 50,
-                age_range: [20, 15],
-                relationship_type: ["Serious"],
-                height_range: [160, 190],
-                dating_intentions: ["Long-term"],
-                children: "Wants someday",
-                family_plans: "Wants kids",
-                vices: ["None"],
-                politics: "Liberal",
-                education: "Graduate Degree"
-            }
+            profile: location.state?.profile,
         };
     
         console.log("Submitting:", payload);  // Check what's being sent
