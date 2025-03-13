@@ -134,6 +134,25 @@ def scrape_reddit():
     except Exception as e:
         return jsonify({"error in reddit scrape": str(e)}), 500
 
+# returns profile
+@app.route("/redditprofilescrape", methods=["POST"])
+def scrape_reddit_profile():
+    try:
+        data = request.json
+        log.debug(f"redditprofilescrape called with: {data}")
+        username = data.get("username", None)
+        if not username:
+            return jsonify({"error": "Expected your JSON to have 'username'"}),400
+
+        from common.Analyzer.parser import scrape_redditaccount_get_profile
+        ans = scrape_redditaccount_get_profile(username)
+        return jsonify({"response:": ans}), 200
+
+
+        
+
+    except Exception as e:
+        return jsonify({"error in reddit scrape 2": str(e)}), 500
 
 @app.route('/', methods=['GET'])
 def list_endpoints():

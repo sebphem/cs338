@@ -2,4 +2,4 @@ from parser import *
 
 
 
-print("These are the responses generated after step_one():", scrape_redditaccount("sickandinjured"))
+print("These are the responses generated after step_one():\n", scrape_redditaccount("mizen002"))

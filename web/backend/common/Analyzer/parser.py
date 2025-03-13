@@ -134,7 +134,7 @@ def step_one(user_data):
                            "Don’t be vague in prompts",
                            "Try to avoid politics",
                            "While keeping it brief and concise, avoid one to two word answers that can be considered boring",
-                           "Keep it casual and sound like a 20ish year old"
+                           "Keep it casual and sound like a 20ish year old",
                            ]
         chat = client.chat.completions.create(
         model="gpt-4o",
@@ -225,8 +225,8 @@ def scrape_redditaccount(username):
         redditor = reddit.redditor(username)
 
         # Fetch X amount of posts and comments
-        posts = list(redditor.submissions.new(limit=20))
-        comments = list(redditor.comments.new(limit=40))
+        posts = list(redditor.submissions.new(limit=50))
+        comments = list(redditor.comments.new(limit=100))
 
         # Combine posts and comments into a single text block
         raw_text = ""
@@ -284,8 +284,87 @@ def scrape_redditaccount(username):
         stream=False,
         )
         ans = chat.choices[0].message.content
-        #print("\nPROFILE GENERATED:", ans, "\n")
+        print("\nPROFILE GENERATED:", ans, "\n")
         return step_one(ans)
+    except Exception as e:
+        print(f"An error occurred w/ reddit api: {e}")
+        return "rip bozo"
+    
+def scrape_redditaccount_get_profile(username):
+    client_id = "g6kqrkPgVFQUeQNmN-Ts6w"
+    secret_id = "otZMEI2n56-YQ1kWSe49RwhjWe4IXQ"
+    agent = "reddit scraper for dating profile maker"
+    reddit = praw.Reddit(
+        client_id=client_id,
+        client_secret=secret_id,
+        user_agent=agent
+    )
+    try:
+        # scrape them
+        redditor = reddit.redditor(username)
+
+        # Fetch X amount of posts and comments
+        posts = list(redditor.submissions.new(limit=50))
+        comments = list(redditor.comments.new(limit=100))
+
+        # Combine posts and comments into a single text block
+        raw_text = ""
+        for post in posts:
+            raw_text += f"Post Title: {post.title}\n"
+            if post.selftext:  # Add post body if it exists
+                raw_text += f"Post Body: {post.selftext}\n"
+            raw_text += "\n"
+
+        for comment in comments:
+            raw_text += f"Comment: {comment.body}\n"
+            raw_text += "\n"
+
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        main_prompt = """You are trying to help a user build a dating profile. Please parse the text below and fill in whatever you can on this interface. If something seems relevant, just tag it to the Other_Notable_aspects section:
+                         name: str, 
+                 age: int, 
+                 height: int, 
+                 location: str,
+                 preferences: Optional[str] = None,
+                 dating_intentions: Optional[List[str]] = None, 
+                 relationship_type: Optional[List[str]] = None, 
+                 ethnicity: Optional[List[str]] = None, 
+                 children: Optional[str] = None, 
+                 family_plans: Optional[str] = None, 
+                 covid_vaccine: Optional[bool] = None, 
+                 pets: Optional[str] = None, 
+                 zodiac: Optional[str] = None, 
+                 work: Optional[str] = None, 
+                 job_title: Optional[str] = None, 
+                 school: Optional[str] = None, 
+                 education: Optional[str] = None, 
+                 religious_beliefs: Optional[str] = None, 
+                 hometown: Optional[str] = None, 
+                 politics: Optional[str] = None, 
+                 languages: Optional[List[str]] = None, 
+                 drinking: Optional[str] = None, 
+                 smoking: Optional[bool] = None, 
+                 weed: Optional[bool] = None, 
+                 preferences: Something,
+                 Hobbies: Something,
+                 Interests: something,
+                 Other_Notable_aspects: something,
+
+                 drugs: Optional[bool] = None):
+
+        """
+        chat = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": main_prompt},
+            {"role": "user", "content": raw_text}
+        ],
+        stream=False,
+        )
+        ans = chat.choices[0].message.content
+        print("\nPROFILE GENERATED:", ans, "\n")
+        return ans
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
         return "rip bozo"
@@ -330,7 +409,7 @@ if __name__ == "__main__":
         user_answer = input()
 
 
-    print(f"CHAT ENDED! information gathered: {user_profile_with_optional["preferences"]}")
+    print(f"CHAT ENDED! information gathered:", user_profile_with_optional["preferences"])
     #print(user_preferences_with_optional)
 
     #ud = UserData(user_profile_with_optional, user_preferences_with_optional)
