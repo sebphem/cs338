@@ -273,7 +273,7 @@ def scrape_redditaccount(username):
                  Other_Notable_aspects: something,
 
                  drugs: Optional[bool] = None):
-
+        Keep the generated profile in plaintext when you show me later. Show all fields even if they're blank
         """
         chat = client.chat.completions.create(
         model="gpt-4o",
@@ -352,6 +352,7 @@ def scrape_redditaccount_get_profile(username):
                  Other_Notable_aspects: something,
 
                  drugs: Optional[bool] = None):
+        Keep the generated profile in plaintext when you show me later. Show all fields even if they're blank
 
         """
         chat = client.chat.completions.create(
