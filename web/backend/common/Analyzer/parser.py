@@ -284,7 +284,7 @@ def scrape_redditaccount(username):
         stream=False,
         )
         ans = chat.choices[0].message.content
-        print("\nPROFILE GENERATED:", ans, "\n")
+        #print("\nPROFILE GENERATED:", ans, "\n")
         return step_one(ans)
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
@@ -364,7 +364,7 @@ def scrape_redditaccount_get_profile(username):
         stream=False,
         )
         ans = chat.choices[0].message.content
-        print("\nPROFILE GENERATED:", ans, "\n")
+        #print("\nPROFILE GENERATED:", ans, "\n")
         return ans
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
