@@ -24,6 +24,49 @@ def analyze_pictures(pictures, profile):
     except Exception as e:
         raise Exception("error:",e)
 
+def rank_pictures(images, profile):
+    try:
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        IMAGE_PROMPT = """
+You are about to receive multiple photos that are going to be used to make a dating profile.
+
+The photos must be composed of:
+    1 headshot of one person smiling
+    2 photos of you hanging out with friends
+    1 photo of a full body picture of the person standing
+    2 funny photos
+    1 travel photo
+
+If they dont have the correct number of images, please tell them about it in the extras tab. Please give feedback on each
+of their images and how it contributes to their overall profile.
+
+You must respond in the following format:
+[IMAGE NUMBER] - [RESPONSE]
+
+;EXTRAS- [RESPONSE]
+"""
+        user_content= []
+        if images:
+            for image in images:
+                # image_format = png_or_jpg(image)
+                # image_dataurl = f"data:image/{"png"};base64,{image}"
+                user_content.append({"type": "image_url", "image_url": {"url": image}})
+        chat = client.chat.completions.create(
+            model = "gpt-4o",
+            messages = [
+                {"role": "system", "content": IMAGE_PROMPT},
+                {"role":"user", "content":
+                 user_content
+                }
+
+            ],
+            stream = False,
+        )
+        return chat.choices[0].message.content
+    except Exception as e:
+        raise Exception("error:",e)
+
 def png_or_jpg(base64_str):
     # code to check if something is a png or a jpg (from stackoverflow not 100% is this works or not)
     if re.match(r"^/9j/", base64_str):  # JPEG files start with /9j
@@ -39,7 +82,10 @@ def step_one(user_data):
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         user_profile_description = f"Profile: {user_data}"
-        main_prompt = f"Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user. Keep in mind the guidelines we have designed specified in all caps ended with a colon start now:"
+        main_prompt = f"""Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user. 
+        FOR ALL OF YOUR ANSWERS YOU **MUST** DRAW ON SPECIFIC THINGS THAT THE PERSON ENJOYS DOING
+        Keep in mind the guidelines we have designed specified in all caps ended with a colon start now:
+        """
         chat_prompts = [ "RULES AND GUIDELINES:",
     "Gender euphoria looks like",
     "Dating me is like",
@@ -369,6 +415,144 @@ def scrape_redditaccount_get_profile(username):
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
         return "rip bozo"
+
+
+def scrape_redditaccount(username):
+    client_id = "g6kqrkPgVFQUeQNmN-Ts6w"
+    secret_id = "otZMEI2n56-YQ1kWSe49RwhjWe4IXQ"
+    agent = "reddit scraper for dating profile maker"
+    reddit = praw.Reddit(
+        client_id=client_id,
+        client_secret=secret_id,
+        user_agent=agent
+    )
+    try:
+        # scrape them
+        redditor = reddit.redditor(username)
+
+        # Fetch X amount of posts and comments
+        posts = list(redditor.submissions.new(limit=50))
+        comments = list(redditor.comments.new(limit=100))
+
+        # Combine posts and comments into a single text block
+        raw_text = ""
+        for post in posts:
+            raw_text += f"Post Title: {post.title}\n"
+            if post.selftext:  # Add post body if it exists
+                raw_text += f"Post Body: {post.selftext}\n"
+            raw_text += "\n"
+
+        for comment in comments:
+            raw_text += f"Comment: {comment.body}\n"
+            raw_text += "\n"
+
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        main_prompt = """You are trying to help a user build a dating profile. Please parse the text below and fill in whatever you can on this interface. If something seems relevant, just tag it to the Other_Notable_aspects section:
+                         name: str, 
+                 age: int, 
+                 height: int, 
+                 location: str,
+                 preferences: Optional[str] = None,
+                 dating_intentions: Optional[List[str]] = None, 
+                 relationship_type: Optional[List[str]] = None, 
+                 ethnicity: Optional[List[str]] = None, 
+                 children: Optional[str] = None, 
+                 family_plans: Optional[str] = None, 
+                 covid_vaccine: Optional[bool] = None, 
+                 pets: Optional[str] = None, 
+                 zodiac: Optional[str] = None, 
+                 work: Optional[str] = None, 
+                 job_title: Optional[str] = None, 
+                 school: Optional[str] = None, 
+                 education: Optional[str] = None, 
+                 religious_beliefs: Optional[str] = None, 
+                 hometown: Optional[str] = None, 
+                 politics: Optional[str] = None, 
+                 languages: Optional[List[str]] = None, 
+                 drinking: Optional[str] = None, 
+                 smoking: Optional[bool] = None, 
+                 weed: Optional[bool] = None, 
+                 preferences: Something,
+                 Hobbies: Something,
+                 Interests: something,
+                 Other_Notable_aspects: something,
+
+                 drugs: Optional[bool] = None):
+        Keep the generated profile in plaintext when you show me later. Show all fields even if they're blank
+        """
+        chat = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": main_prompt},
+            {"role": "user", "content": raw_text}
+        ],
+        stream=False,
+        )
+        ans = chat.choices[0].message.content
+        #print("\nPROFILE GENERATED:", ans, "\n")
+        return step_one(ans)
+    except Exception as e:
+        print(f"An error occurred w/ reddit api: {e}")
+        return "rip bozo"
+
+def scrape_bookmarks(bookmarks: str):
+    try:
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        main_prompt = """You are trying to help a user build a dating profile. Please parse the text below and fill in whatever you can on this interface. If something seems relevant, just tag it to the Other_Notable_aspects section:
+                         name: str, 
+                 age: int, 
+                 height: int, 
+                 location: str,
+                 preferences: Optional[str] = None,
+                 dating_intentions: Optional[List[str]] = None, 
+                 relationship_type: Optional[List[str]] = None, 
+                 ethnicity: Optional[List[str]] = None, 
+                 children: Optional[str] = None, 
+                 family_plans: Optional[str] = None, 
+                 covid_vaccine: Optional[bool] = None, 
+                 pets: Optional[str] = None, 
+                 zodiac: Optional[str] = None, 
+                 work: Optional[str] = None, 
+                 job_title: Optional[str] = None, 
+                 school: Optional[str] = None, 
+                 education: Optional[str] = None, 
+                 religious_beliefs: Optional[str] = None, 
+                 hometown: Optional[str] = None, 
+                 politics: Optional[str] = None, 
+                 languages: Optional[List[str]] = None, 
+                 drinking: Optional[str] = None, 
+                 smoking: Optional[bool] = None, 
+                 weed: Optional[bool] = None, 
+                 preferences: Something,
+                 Hobbies: Something,
+                 Interests: something,
+                 Other_Notable_aspects: something,
+
+                 drugs: Optional[bool] = None):
+        Keep the generated profile in plaintext when you show me later.
+
+        """
+        chat = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": main_prompt},
+            {"role": "user", "content": bookmarks}
+        ],
+        stream=False,
+        )
+        ans = chat.choices[0].message.content
+        print(ans)
+        return step_one(ans)
+    except Exception as e:
+        print(f"scrape bookmarks failed {e}")
+        return "rip bozo"
+
+
+
+
+
 if __name__ == "__main__":
     text = """
     Last Name: Smith

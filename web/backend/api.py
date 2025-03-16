@@ -75,9 +75,9 @@ def best_picture():
         if profile_data and pictures: # unpack data into profile and preferences
             user_profile = Profile(**profile_data)
 
-            from common.Analyzer.parser import analyze_pictures
-            best_picture = analyze_pictures(profile_data, pictures)
-            return jsonify({"picture": best_picture, "profile":user_profile}), 200
+            from common.Analyzer.parser import rank_pictures
+            best_picture = rank_pictures(profile_data, pictures)
+            return jsonify({"picture_info": best_picture, "profile":user_profile}), 200
         else:
             return jsonify({"error": "something went wrong with unpacking profile or pictures was empty", "data:": data}), 400
 
