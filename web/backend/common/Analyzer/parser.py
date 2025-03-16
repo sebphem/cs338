@@ -273,7 +273,7 @@ def scrape_redditaccount(username):
                  Other_Notable_aspects: something,
 
                  drugs: Optional[bool] = None):
-
+        Keep the generated profile in plaintext when you show me later. Show all fields even if they're blank
         """
         chat = client.chat.completions.create(
         model="gpt-4o",
@@ -284,7 +284,7 @@ def scrape_redditaccount(username):
         stream=False,
         )
         ans = chat.choices[0].message.content
-        print("\nPROFILE GENERATED:", ans, "\n")
+        #print("\nPROFILE GENERATED:", ans, "\n")
         return step_one(ans)
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
@@ -352,6 +352,7 @@ def scrape_redditaccount_get_profile(username):
                  Other_Notable_aspects: something,
 
                  drugs: Optional[bool] = None):
+        Keep the generated profile in plaintext when you show me later. Show all fields even if they're blank
 
         """
         chat = client.chat.completions.create(
@@ -363,7 +364,7 @@ def scrape_redditaccount_get_profile(username):
         stream=False,
         )
         ans = chat.choices[0].message.content
-        print("\nPROFILE GENERATED:", ans, "\n")
+        #print("\nPROFILE GENERATED:", ans, "\n")
         return ans
     except Exception as e:
         print(f"An error occurred w/ reddit api: {e}")
