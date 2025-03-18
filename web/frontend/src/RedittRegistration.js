@@ -40,19 +40,55 @@ function RedditProfilePage() {
             return;
         }
 
-        // Convert files to base64 strings
-        const base64Images = await Promise.all(
-            filteredFiles.map(file => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
+        // Convert files to compressed base64 strings
+        const compressedImages = await Promise.all(
+            filteredFiles.map(async file => {
+                // Create a canvas to resize the image
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Create an image object
+                const img = new Image();
+                const imageUrl = URL.createObjectURL(file);
+                
+                // Wait for image to load
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = imageUrl;
                 });
+                
+                // Calculate new dimensions (max 800px width/height)
+                let width = img.width;
+                let height = img.height;
+                const maxSize = 800;
+                
+                if (width > height && width > maxSize) {
+                    height = Math.round((height * maxSize) / width);
+                    width = maxSize;
+                } else if (height > maxSize) {
+                    width = Math.round((width * maxSize) / height);
+                    height = maxSize;
+                }
+                
+                // Set canvas dimensions
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Draw and compress image
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Convert to base64 with compression
+                const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                
+                // Clean up
+                URL.revokeObjectURL(imageUrl);
+                
+                return base64;
             })
         );
 
-        setSelectedImages(base64Images);
+        setSelectedImages(compressedImages);
     };
 
     const handleSubmit = async () => {
@@ -116,16 +152,32 @@ function RedditProfilePage() {
                 if (bestPictureResponse.ok) {
                     bestPictureInfo = {
                         rankingText: bestPictureData.picture_info,
-                        imageFiles: selectedImages // Store base64 images
+                        imageIndices: bestPictureData.image_indices || [] // Store indices instead of full images
                     };
                 }
             }
 
-            // Store bestPictureInfo in sessionStorage
-            sessionStorage.setItem('bestPictureInfo', JSON.stringify({
-                rankingText: bestPictureInfo.rankingText,
-                imageFiles: selectedImages // Store base64 images
-            }));
+            // Store minimal data in sessionStorage
+            try {
+                sessionStorage.setItem('bestPictureInfo', JSON.stringify({
+                    rankingText: bestPictureInfo.rankingText,
+                    imageIndices: bestPictureInfo.imageIndices
+                }));
+                
+                // Store images separately in localStorage with a unique key
+                const storageKey = `images_${Date.now()}`;
+                localStorage.setItem(storageKey, JSON.stringify(selectedImages));
+                
+                // Store the storage key in sessionStorage
+                sessionStorage.setItem('imageStorageKey', storageKey);
+            } catch (storageError) {
+                console.error('Storage error:', storageError);
+                // If storage fails, proceed without storing images
+                sessionStorage.setItem('bestPictureInfo', JSON.stringify({
+                    rankingText: bestPictureInfo.rankingText,
+                    imageIndices: bestPictureInfo.imageIndices
+                }));
+            }
             
             // Redirect to Conversation Page with the profile
             if (isMounted.current) {
