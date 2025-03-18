@@ -159,17 +159,16 @@ function RedditProfilePage() {
 
             // Store minimal data in sessionStorage
             try {
-                sessionStorage.setItem('bestPictureInfo', JSON.stringify({
-                    rankingText: bestPictureInfo.rankingText,
-                    imageIndices: bestPictureInfo.imageIndices
-                }));
-                
-                // Store images separately in localStorage with a unique key
+                // Store images in localStorage first
                 const storageKey = `images_${Date.now()}`;
                 localStorage.setItem(storageKey, JSON.stringify(selectedImages));
                 
-                // Store the storage key in sessionStorage
-                sessionStorage.setItem('imageStorageKey', storageKey);
+                // Then store the reference in sessionStorage
+                sessionStorage.setItem('bestPictureInfo', JSON.stringify({
+                    rankingText: bestPictureInfo.rankingText,
+                    imageIndices: bestPictureInfo.imageIndices,
+                    storageKey: storageKey // Store the key to retrieve images
+                }));
             } catch (storageError) {
                 console.error('Storage error:', storageError);
                 // If storage fails, proceed without storing images
@@ -201,6 +200,17 @@ function RedditProfilePage() {
             ia[i] = byteString.charCodeAt(i);
         }
         return new Blob([ab], { type });
+    };
+
+    // Helper function to get image from storage
+    const getImageFromStorage = (storageKey, index) => {
+        try {
+            const storedImages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            return storedImages[index] || '';
+        } catch (error) {
+            console.error('Error retrieving image from storage:', error);
+            return '';
+        }
     };
 
     return (
@@ -244,7 +254,7 @@ function RedditProfilePage() {
                             {selectedImages.map((image, index) => (
                                 <img 
                                     key={index} 
-                                    src={image} 
+                                    src={typeof image === 'string' ? image : ''} 
                                     alt={`Preview ${index + 1}`} 
                                     className="rounded" 
                                     style={{ width: "100px", height: "100px", objectFit: "cover" }} 
