@@ -84,14 +84,12 @@ function RedditProfilePage() {
             setProfile(structuredProfile);
 
             // Step 2: Upload Images & Get Best Picture
-            const imageUrls = selectedImages.map(file => URL.createObjectURL(file));
-
             let bestPictureInfo = null;
             if (selectedImages.length > 0) {
                 const formData = new FormData();
                 formData.append("profile", JSON.stringify(structuredProfile));
                 selectedImages.forEach((image, index) => {
-                    formData.append(`pictures`, image);
+                    formData.append("pictures", image);
                 });
 
                 const bestPictureResponse = await fetch('http://127.0.0.1:8000/best-picture', {
@@ -105,49 +103,46 @@ function RedditProfilePage() {
                 if (bestPictureResponse.ok) {
                     bestPictureInfo = {
                         rankingText: bestPictureData.picture_info,
-                        imageFiles: imageUrls
-                        //imageFiles: selectedImages
+                        imageFiles: selectedImages.map((file) => ({
+                            name: file.name,
+                            type: file.type,
+                            data: URL.createObjectURL(file), // Convert File object to blob URL
+                        })),
                     };
-                    console.log(imageUrls);
                 }
             }
 
-            // // Step 3: Fetch Generated Prompts
-            // const promptsResponse = await fetch('http://127.0.0.1:8000/redditscrape', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ username: redditUsername })
-            // });
+            // Step 3: Fetch Generated Prompts
+            const promptsResponse = await fetch('http://127.0.0.1:8000/redditscrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: redditUsername })
+            });
 
-            // const promptsData = await promptsResponse.json();
-            // console.log("Generated Prompts:", promptsData);
+            const promptsData = await promptsResponse.json();
+            console.log("Generated Prompts:", promptsData);
 
-            // if (!promptsResponse.ok) {
-            //     if (isMounted.current) setError('Failed to generate prompts.');
-            //     return;
-            //     // setError('Failed to generate prompts.');
-            //     // setIsLoading(false);
-            //     // return;
-            // }
-
-            // // Step 4: Redirect to ResultsPage
-            // if (isMounted.current) {
-            //     history.push('/results', { 
-            //         profile: structuredProfile, 
-            //         prompts: promptsData.response, 
-            //         bestPicture: bestPictureInfo
-            //     });
-            // }
-            // **Store bestPictureInfo in localStorage (for later use in ResultsPage)**
-            sessionStorage.setItem('bestPictureInfo', JSON.stringify({
-                rankingText: bestPictureInfo.rankingText,
-                imageFiles: imageUrls  // Store Image URLs properly
-            }));
-            
-            // **Redirect to Conversation Page with ONLY the profile**
-            if (isMounted.current) {
-                history.push('/chat', { profile: structuredProfile });
+            if (!promptsResponse.ok) {
+                if (isMounted.current) setError('Failed to generate prompts.');
+                return;
+                // setError('Failed to generate prompts.');
+                // setIsLoading(false);
+                // return;
             }
+
+            // Step 4: Redirect to ResultsPage
+            if (isMounted.current) {
+                history.push('/results', { 
+                    profile: structuredProfile, 
+                    prompts: promptsData.response, 
+                    bestPicture: bestPictureInfo
+                });
+            }
+            // history.push('/results', { 
+            //     profile: structuredProfile, 
+            //     prompts: promptsData.response, 
+            //     bestPicture: bestPictureInfo
+            // });
 
         } catch (error) {
             if (isMounted.current) setError('An error occurred while fetching the Reddit profile.');
