@@ -24,7 +24,7 @@ function RedditProfilePage() {
         setRedditUsername(event.target.value);
     };
 
-    const handleImageUpload = (event) => {
+    const handleImageUpload = async (event) => {
         const files = Array.from(event.target.files);
         const validTypes = ["image/jpeg", "image/png"];
 
@@ -39,7 +39,20 @@ function RedditProfilePage() {
             setError("You can upload up to 10 images only.");
             return;
         }
-        setSelectedImages(filteredFiles);
+
+        // Convert files to base64 strings
+        const base64Images = await Promise.all(
+            filteredFiles.map(file => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            })
+        );
+
+        setSelectedImages(base64Images);
     };
 
     const handleSubmit = async () => {
@@ -70,9 +83,6 @@ function RedditProfilePage() {
             if (!profileResponse.ok || !profileData.response) {
                 if (isMounted.current) setError('Failed to generate profile.');
                 return;
-                // setError('Failed to generate profile.');
-                // setIsLoading(false);
-                // return;
             }
 
             const structuredProfile = {};
@@ -84,14 +94,15 @@ function RedditProfilePage() {
             setProfile(structuredProfile);
 
             // Step 2: Upload Images & Get Best Picture
-            const imageUrls = selectedImages.map(file => URL.createObjectURL(file));
-
             let bestPictureInfo = null;
             if (selectedImages.length > 0) {
                 const formData = new FormData();
                 formData.append("profile", JSON.stringify(structuredProfile));
                 selectedImages.forEach((image, index) => {
-                    formData.append(`pictures`, image);
+                    // Convert base64 to blob for upload
+                    const base64Data = image.split(',')[1];
+                    const blob = base64ToBlob(base64Data, 'image/jpeg');
+                    formData.append(`pictures`, blob);
                 });
 
                 const bestPictureResponse = await fetch('http://127.0.0.1:8000/best-picture', {
@@ -105,58 +116,39 @@ function RedditProfilePage() {
                 if (bestPictureResponse.ok) {
                     bestPictureInfo = {
                         rankingText: bestPictureData.picture_info,
-                        imageFiles: imageUrls
-                        //imageFiles: selectedImages
+                        imageFiles: selectedImages // Store base64 images
                     };
-                    console.log(imageUrls);
                 }
             }
 
-            // // Step 3: Fetch Generated Prompts
-            // const promptsResponse = await fetch('http://127.0.0.1:8000/redditscrape', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ username: redditUsername })
-            // });
-
-            // const promptsData = await promptsResponse.json();
-            // console.log("Generated Prompts:", promptsData);
-
-            // if (!promptsResponse.ok) {
-            //     if (isMounted.current) setError('Failed to generate prompts.');
-            //     return;
-            //     // setError('Failed to generate prompts.');
-            //     // setIsLoading(false);
-            //     // return;
-            // }
-
-            // // Step 4: Redirect to ResultsPage
-            // if (isMounted.current) {
-            //     history.push('/results', { 
-            //         profile: structuredProfile, 
-            //         prompts: promptsData.response, 
-            //         bestPicture: bestPictureInfo
-            //     });
-            // }
-            // **Store bestPictureInfo in localStorage (for later use in ResultsPage)**
+            // Store bestPictureInfo in sessionStorage
             sessionStorage.setItem('bestPictureInfo', JSON.stringify({
                 rankingText: bestPictureInfo.rankingText,
-                imageFiles: imageUrls  // Store Image URLs properly
+                imageFiles: selectedImages // Store base64 images
             }));
             
-            // **Redirect to Conversation Page with ONLY the profile**
+            // Redirect to Conversation Page with the profile
             if (isMounted.current) {
                 history.push('/chat', { profile: structuredProfile });
             }
 
         } catch (error) {
             if (isMounted.current) setError('An error occurred while fetching the Reddit profile.');
-            // setError('An error occurred while fetching the Reddit profile.');
             console.error('Error:', error);
         } finally {
             if (isMounted.current) setIsLoading(false);
-            //setIsLoading(false);
         }
+    };
+
+    // Helper function to convert base64 to blob
+    const base64ToBlob = (base64, type) => {
+        const byteString = atob(base64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type });
     };
 
     return (
@@ -175,7 +167,6 @@ function RedditProfilePage() {
                         placeholder="Enter your Reddit username"
                         value={redditUsername}
                         onChange={handleUsernameChange}
-                        // autoFocus
                         disabled={isLoading}
                     />
                 </Form.Group>
@@ -198,10 +189,10 @@ function RedditProfilePage() {
                     <div className="mt-3">
                         <h5>Selected Images:</h5>
                         <div className="d-flex flex-wrap gap-2">
-                            {selectedImages.map((file, index) => (
+                            {selectedImages.map((image, index) => (
                                 <img 
                                     key={index} 
-                                    src={URL.createObjectURL(file)} 
+                                    src={image} 
                                     alt={`Preview ${index + 1}`} 
                                     className="rounded" 
                                     style={{ width: "100px", height: "100px", objectFit: "cover" }} 
