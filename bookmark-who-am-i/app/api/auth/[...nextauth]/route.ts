@@ -21,7 +21,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.photos.readonly openid email profile",
+          scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.photos.readonly https://www.googleapis.com/auth/documents.readonly openid email profile",
           prompt: "consent",
           access_type: "offline",
           response_type: "code"

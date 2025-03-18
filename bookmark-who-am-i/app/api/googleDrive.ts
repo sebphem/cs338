@@ -4,37 +4,78 @@ import { google } from 'googleapis';
 export function initializeGoogleDrive(accessToken: string) {
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: accessToken });
-  return google.drive({ version: 'v3', auth });
+  return {
+    drive: google.drive({ version: 'v3', auth }),
+    docs: google.docs({ version: 'v1', auth })
+  };
+}
+
+// Function to get content from a Google Doc
+async function getGoogleDocContent(docs: any, docId: string): Promise<string | null> {
+  try {
+    const doc = await docs.documents.get({
+      documentId: docId
+    });
+
+    if (!doc.data.body.content) {
+      return null;
+    }
+
+    // Extract text content from the document
+    let text = '';
+    const content = doc.data.body.content;
+    
+    for (const element of content) {
+      if (element.paragraph) {
+        for (const paragraphElement of element.paragraph.elements) {
+          if (paragraphElement.textRun && paragraphElement.textRun.content) {
+            text += paragraphElement.textRun.content;
+          }
+        }
+      }
+    }
+
+    return text;
+  } catch (error) {
+    console.error('Error getting Google Doc content:', error);
+    return null;
+  }
 }
 
 // Function to get random text content from Google Drive
 export async function getRandomTextContent(accessToken: string): Promise<string | null> {
   try {
-    const drive = initializeGoogleDrive(accessToken);
+    const { drive, docs } = initializeGoogleDrive(accessToken);
     
-    // List all text files in the user's drive
+    // List all text files and Google Docs in the user's drive
     const response = await drive.files.list({
-      q: "mimeType contains 'text/' and trashed = false",
-      fields: 'files(id, name)',
+      q: "(mimeType contains 'text/' or mimeType = 'application/vnd.google-apps.document') and trashed = false",
+      fields: 'files(id, name, mimeType)',
       pageSize: 1000
     });
 
     const files = response.data.files;
     if (!files || files.length === 0) {
-      throw new Error('No text files found in Google Drive');
+      throw new Error('No text files or Google Docs found in Google Drive');
     }
 
-    // Select a random text file
+    // Select a random file
     const randomIndex = Math.floor(Math.random() * files.length);
     const randomFile = files[randomIndex];
 
-    // Get the file content
-    const content = await drive.files.get({
-      fileId: randomFile.id!,
-      alt: 'media'
-    }, { responseType: 'text' });
+    // Handle different file types
+    if (randomFile.mimeType === 'application/vnd.google-apps.document') {
+      // Google Doc
+      return await getGoogleDocContent(docs, randomFile.id!);
+    } else {
+      // Regular text file
+      const content = await drive.files.get({
+        fileId: randomFile.id!,
+        alt: 'media'
+      }, { responseType: 'text' });
 
-    return content.data as string;
+      return content.data as string;
+    }
   } catch (error) {
     console.error('Error getting random text from Google Drive:', error);
     return null;
@@ -44,13 +85,13 @@ export async function getRandomTextContent(accessToken: string): Promise<string 
 // Function to get a random image from Google Drive
 export async function getRandomDriveImage(accessToken: string): Promise<string | null> {
   try {
-    const drive = initializeGoogleDrive(accessToken);
+    const { drive } = initializeGoogleDrive(accessToken);
     
     // List all image files in the user's drive
     const response = await drive.files.list({
       q: "mimeType contains 'image/' and trashed = false",
       fields: 'files(id, name)',
-      pageSize: 1000 // Adjust this number based on how many images you want to search through
+      pageSize: 1000
     });
 
     const files = response.data.files;
