@@ -108,6 +108,7 @@ function RedditProfilePage() {
                         imageFiles: imageUrls
                         //imageFiles: selectedImages
                     };
+                    console.log(imageUrls);
                 }
             }
 
