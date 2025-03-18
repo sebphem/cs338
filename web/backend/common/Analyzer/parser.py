@@ -7,22 +7,66 @@ import praw
 def get_keys():
     return "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"
 
+import base64
+import mimetypes
 def analyze_pictures(pictures, profile):
     try:
+        # 1️⃣ Get API Key
         API_KEY = get_keys()
-        client = OpenAI(api_key = API_KEY)
-        chat = client.chat.completions.create(
-            model = "gpt-4o",
-            messages = [
-                {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile of: {profile}"},
-                {"role:":"user", "content": pictures }
+        client = OpenAI(api_key=API_KEY)
 
+        # 2️⃣ Convert images to base64 correctly (Read Once!)
+        image_objects = []
+        for picture in pictures:
+            image_data = picture.read()  # ✅ Read once and store
+
+            # Detect MIME type
+            mime_type = mimetypes.guess_type(picture.filename)[0] or "image/jpeg"
+            if mime_type not in ["image/jpeg", "image/png"]:
+                raise Exception(f"Invalid image format: {mime_type}. Only JPEG and PNG are supported.")
+
+            # Encode image as Base64
+            encoded_image = base64.b64encode(image_data).decode("utf-8").replace("\n", "")
+
+            # Append properly formatted image
+            image_objects.append(
+                {
+                    "type": "image_url",
+                    "image_url": f"data:{mime_type};base64,{encoded_image}",  # ✅ Fix: Correct format
+                }
+            )
+
+        # 3️⃣ Call OpenAI API with Proper Image Format
+        chat = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile: {profile}"},
+                {"role": "user", "content": [{"type": "text", "text": "Here are some images for analysis."}] + image_objects}  # ✅ Fix: Append images correctly
             ],
-            stream = False,
+            stream=False,
         )
+
         return chat.choices[0].message.content
+
     except Exception as e:
-        raise Exception("error:",e)
+        raise Exception(f"error: {str(e)}")
+
+# def analyze_pictures(pictures, profile):
+#     try:
+#         API_KEY = get_keys()
+#         client = OpenAI(api_key = API_KEY)
+#         chat = client.chat.completions.create(
+#             model = "gpt-4o",
+#             messages = [
+#                 {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile of: {profile}"},
+#                 {"role": "user", "content": pictures }
+
+#             ],
+#             stream = False,
+#         )
+#         return chat.choices[0].message.content
+#     except Exception as e:
+#         raise Exception("error:",e)
 
 def rank_pictures(images, profile):
     try:

@@ -63,6 +63,7 @@ def step_two():
         return jsonify({"error": str(e)}), 500
     
 # called with POST and give the user profile and an array of dataurl pictures
+import json
 @app.route("/best-picture", methods=["POST"])
 def best_picture():
     try:
@@ -83,6 +84,25 @@ def best_picture():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+# def best_picture():
+#     try:
+#         data = request.json
+#         log.debug(f"best_picture called with: {data}")
+#         profile_data = data.get("profile", {}) # type: ignore
+#         pictures = data.get("pictures", [])
+#         from interface import Profile
+
+#         if profile_data and pictures: # unpack data into profile and preferences
+#             user_profile = Profile(**profile_data)
+
+#             from common.Analyzer.parser import analyze_pictures
+#             best_picture = analyze_pictures(profile_data, pictures)
+#             return jsonify({"picture": best_picture, "profile":user_profile}), 200
+#         else:
+#             return jsonify({"error": "something went wrong with unpacking profile or pictures was empty", "data:": data}), 400
+
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 # called with POST and starts a conversation to fill in details about the user
 @app.route("/convo_answer", methods=["POST"])
@@ -126,7 +146,7 @@ def scrape_reddit():
 
         from common.Analyzer.parser import scrape_redditaccount
         ans = scrape_redditaccount(username)
-        return jsonify({"response:": ans}), 200
+        return jsonify({"response": ans}), 200
 
 
         
@@ -146,7 +166,7 @@ def scrape_reddit_profile():
 
         from common.Analyzer.parser import scrape_redditaccount_get_profile
         ans = scrape_redditaccount_get_profile(username)
-        return jsonify({"response:": ans}), 200
+        return jsonify({"response": ans}), 200
 
 
         
