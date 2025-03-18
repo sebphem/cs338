@@ -64,23 +64,35 @@ def step_two():
     
 # called with POST and give the user profile and an array of dataurl pictures
 import json
+import base64
+import mimetypes
+from flask import request, jsonify
+
 @app.route("/best-picture", methods=["POST"])
 def best_picture():
     try:
-        data = request.json
-        log.debug(f"best_picture called with: {data}")
-        profile_data = data.get("profile", {}) # type: ignore
-        pictures = data.get("pictures", [])
-        from interface import Profile
+        # Extract profile text (as unstructured text)
+        profile_text = request.form.get("profile")  # Expecting raw text from form-data
+        if not profile_text:
+            return jsonify({"error": "Profile data missing"}), 400
 
-        if profile_data and pictures: # unpack data into profile and preferences
-            user_profile = Profile(**profile_data)
+        # Convert profile text into a dictionary
+        profile_data = {}
+        for line in profile_text.split("\n"):
+            if ": " in line:
+                key, value = line.split(": ", 1)
+                profile_data[key.strip()] = value.strip() if value else ""
 
-            from common.Analyzer.parser import rank_pictures
-            best_picture = rank_pictures(profile_data, pictures)
-            return jsonify({"picture_info": best_picture, "profile":user_profile}), 200
-        else:
-            return jsonify({"error": "something went wrong with unpacking profile or pictures was empty", "data:": data}), 400
+        # Extract uploaded images
+        pictures = request.files.getlist("pictures")  # Retrieve multiple images
+        if not pictures:
+            return jsonify({"error": "No pictures uploaded"}), 400
+
+        # Rank pictures using AI
+        from common.Analyzer.parser import rank_pictures
+        best_picture = rank_pictures(pictures, profile_data)
+
+        return jsonify({"picture_info": best_picture, "profile": profile_data}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

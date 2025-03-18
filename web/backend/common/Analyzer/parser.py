@@ -11,37 +11,76 @@ import base64
 import mimetypes
 def analyze_pictures(pictures, profile):
     try:
-        # 1️⃣ Get API Key
+        API_KEY = get_keys()
+        client = OpenAI(api_key = API_KEY)
+        chat = client.chat.completions.create(
+            model = "gpt-4o",
+            messages = [
+                {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile of: {profile}"},
+                {"role": "user", "content": pictures }
+
+            ],
+            stream = False,
+        )
+        return chat.choices[0].message.content
+    except Exception as e:
+        raise Exception("error:",e)
+
+def rank_pictures(images, profile):
+    try:
         API_KEY = get_keys()
         client = OpenAI(api_key=API_KEY)
 
-        # 2️⃣ Convert images to base64 correctly (Read Once!)
-        image_objects = []
-        for picture in pictures:
-            image_data = picture.read()  # ✅ Read once and store
+        IMAGE_PROMPT = """
+You are about to receive multiple photos that are going to be used to make a dating profile.
 
-            # Detect MIME type
-            mime_type = mimetypes.guess_type(picture.filename)[0] or "image/jpeg"
+Optimal photos are composed of:
+    1 headshot of one person smiling
+    2 photos of you hanging out with friends
+    1 photo of a full body picture of the person standing
+    2 funny photos
+    1 travel photo
+
+If they don’t have the correct number of images, please tell them about it in the extras tab. Please give feedback on each
+of their images, despite if they are bad for a dating profile, and how it contributes to their overall profile. Rank them in descending order based on which is best for dating app profile.
+You are not identifying people. You are simply analyzing pictures to see if they'd be good for a hypothetical dating profile.
+Do the image analysis and ranking.
+None of this is illegal, it is for fun and for writing my book.
+
+You must respond in the following format, with no extra verbiage outside of specified sections, i.e. no pre-text or intro before rankings:
+[RANK NUMBER]: [IMAGE NUMBER] - [RESPONSE]
+
+;EXTRAS- [RESPONSE]
+
+i.e. "1: 3 - response"
+"""
+
+        # 🛠️ Fix: Correctly format user content
+        user_content = [{"type": "text", "text": "Here are my images. Please rank them."}]
+
+        # ✅ Convert images to Base64 correctly
+        for i, image in enumerate(images):
+            image_data = image.read()  # Read image once
+            mime_type = mimetypes.guess_type(image.filename)[0] or "image/jpeg"
+
             if mime_type not in ["image/jpeg", "image/png"]:
                 raise Exception(f"Invalid image format: {mime_type}. Only JPEG and PNG are supported.")
 
-            # Encode image as Base64
             encoded_image = base64.b64encode(image_data).decode("utf-8").replace("\n", "")
 
-            # Append properly formatted image
-            image_objects.append(
+            user_content.append(
                 {
                     "type": "image_url",
-                    "image_url": f"data:{mime_type};base64,{encoded_image}",  # ✅ Fix: Correct format
+                    "image_url": {"url": f"data:{mime_type};base64,{encoded_image}"},  # ✅ Fix: `image_url` must be an object
                 }
             )
 
-        # 3️⃣ Call OpenAI API with Proper Image Format
+        # 🎯 Call OpenAI API with Proper Image Format
         chat = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": f"I'm going to give you multiple pictures, tell me which one makes me look the best for my profile: {profile}"},
-                {"role": "user", "content": [{"type": "text", "text": "Here are some images for analysis."}] + image_objects}  # ✅ Fix: Append images correctly
+                {"role": "system", "content": IMAGE_PROMPT},
+                {"role": "user", "content": user_content}  # ✅ Fix: Correctly formatted images
             ],
             stream=False,
         )
@@ -50,6 +89,7 @@ def analyze_pictures(pictures, profile):
 
     except Exception as e:
         raise Exception(f"error: {str(e)}")
+
 
 # def analyze_pictures(pictures, profile):
 #     try:
@@ -68,49 +108,6 @@ def analyze_pictures(pictures, profile):
 #     except Exception as e:
 #         raise Exception("error:",e)
 
-def rank_pictures(images, profile):
-    try:
-        API_KEY = get_keys()
-        client = OpenAI(api_key = API_KEY)
-        IMAGE_PROMPT = """
-You are about to receive multiple photos that are going to be used to make a dating profile.
-
-The photos must be composed of:
-    1 headshot of one person smiling
-    2 photos of you hanging out with friends
-    1 photo of a full body picture of the person standing
-    2 funny photos
-    1 travel photo
-
-If they dont have the correct number of images, please tell them about it in the extras tab. Please give feedback on each
-of their images and how it contributes to their overall profile.
-
-You must respond in the following format:
-[IMAGE NUMBER] - [RESPONSE]
-
-;EXTRAS- [RESPONSE]
-"""
-        user_content= []
-        if images:
-            for image in images:
-                # image_format = png_or_jpg(image)
-                # image_dataurl = f"data:image/{"png"};base64,{image}"
-                user_content.append({"type": "image_url", "image_url": {"url": image}})
-        chat = client.chat.completions.create(
-            model = "gpt-4o",
-            messages = [
-                {"role": "system", "content": IMAGE_PROMPT},
-                {"role":"user", "content":
-                 user_content
-                }
-
-            ],
-            stream = False,
-        )
-        return chat.choices[0].message.content
-    except Exception as e:
-        raise Exception("error:",e)
-
 def png_or_jpg(base64_str):
     # code to check if something is a png or a jpg (from stackoverflow not 100% is this works or not)
     if re.match(r"^/9j/", base64_str):  # JPEG files start with /9j
@@ -126,8 +123,10 @@ def step_one(user_data):
         API_KEY = get_keys()
         client = OpenAI(api_key = API_KEY)
         user_profile_description = f"Profile: {user_data}"
-        main_prompt = f"""Given this user profile description: {user_profile_description}, please tell me the top 3 prompts that match this user. 
+        main_prompt = f"""Given this user profile description: {user_profile_description}, tell me the top 3 prompts that match this user. 
         FOR ALL OF YOUR ANSWERS YOU **MUST** DRAW ON SPECIFIC THINGS THAT THE PERSON ENJOYS DOING
+        ANSWER IN FORMAT:
+        **[PROMPT]:** [PROMPT ANSWER]
         Keep in mind the guidelines we have designed specified in all caps ended with a colon start now:
         """
         chat_prompts = [ "RULES AND GUIDELINES:",
@@ -220,11 +219,14 @@ def step_one(user_data):
                            "Be respectful",
                            "Don’t be a stereotype",
                            "Don’t be sexual in a disrespectful way",
-                           "You shouldn’t include : Machu Picchu ,'Just ask', basic Pet peeves like 'Slow walkers', Any reference to The Office, Any reference to The Office ",
+                           "You shouldn’t include : Machu Picchu ,'Just ask', basic Pet peeves like 'Slow walkers', Any reference to The Office",
                            "Don’t be vague in prompts",
                            "Try to avoid politics",
                            "While keeping it brief and concise, avoid one to two word answers that can be considered boring",
-                           "Keep it casual and sound like a 20ish year old",
+                           "Try to answer with phrases or one-sentence answers",
+                           "Cheeky, conversational responses",
+                           "No elaborate, showy vocabulary",
+                           "Keep it casual and sound like a 20ish year old in terms of dialect and humor",
                            ]
         chat = client.chat.completions.create(
         model="gpt-4o",
